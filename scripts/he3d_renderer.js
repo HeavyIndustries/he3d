@@ -130,7 +130,7 @@ he3d.r.listCaps=function(){
 			if(he3d.r.glExts[gle]=='MOZ_EXT_texture_filter_anisotropic'||
 				he3d.r.glExts[gle]=='WEBKIT_EXT_texture_filter_anisotropic'||
 				he3d.r.glExts[gle]=='EXT_texture_filter_anisotropic'){
-				if(!(he3d.t.af.ext=he3d.gl.getExtension(he3d.r.glExts[gle])))
+				if(he3d.t.af.ext=he3d.gl.getExtension(he3d.r.glExts[gle]))
 					he3d.t.af.max=he3d.gl.getParameter(he3d.t.af.ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
 			}
 		}
