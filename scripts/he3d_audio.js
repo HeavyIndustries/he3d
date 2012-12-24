@@ -56,7 +56,11 @@ he3d.a.load=function(sound){
 					'Invalid or missing filename for '+sound.type+' sound');
 				return;
 			}
-			newsound.sound=new Audio(he3d.a.path+sound.filename)
+			if(!(newsound.sound=new Audio(he3d.a.path+sound.filename))){
+				he3d.log('WARNING','Failed to Load Sound('+newsound.id+'):',
+					he3d.a.path+sound.filename);
+				return;
+			}
 			he3d.log('NOTICE','Loaded Sound('+newsound.id+'):',he3d.a.path+sound.filename);
 			if(newsound.loop){
 				if(typeof(newsound.sound.loop)=='boolean'){
@@ -103,6 +107,7 @@ he3d.a.play=function(sid){
 	switch(he3d.a.sounds[sid].state){
 		case 'paused':
 		case 'stopped':
+			he3d.a.sounds[sid].sound.currentTime=0;
 			he3d.a.sounds[sid].sound.play();
 			he3d.a.sounds[sid].state='playing';
 			break;

@@ -18,6 +18,8 @@ he3d.r={
 		now:0,
 		show:0
 	},
+	forceRebind:false,
+	fullscreen:false,
 	glAttribs:{},
 	glExts:{},
 	glOpts:{
@@ -32,7 +34,6 @@ he3d.r={
 		maxaf:0,
 		textures:16
 	},
-	fullscreen:false,
 	mvMatrixStack:[],
 	renderables:[],
 	targets:{
@@ -41,7 +42,7 @@ he3d.r={
 			rbo:null
 		}
 	},
-	windowsize:[960,540]
+	windowSize:[960,540]
 };
 
 //
@@ -131,7 +132,8 @@ he3d.r.listCaps=function(){
 				he3d.r.glExts[gle]=='WEBKIT_EXT_texture_filter_anisotropic'||
 				he3d.r.glExts[gle]=='EXT_texture_filter_anisotropic'){
 				if(he3d.t.af.ext=he3d.gl.getExtension(he3d.r.glExts[gle]))
-					he3d.t.af.max=he3d.gl.getParameter(he3d.t.af.ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+					he3d.t.af.max=he3d.gl.getParameter(
+						he3d.t.af.ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
 			}
 		}
 	}
@@ -176,9 +178,20 @@ he3d.r.listCaps=function(){
 
 he3d.r.hasGLExt=function(ext){
 	for(var gle=0;gle<he3d.r.glExts.length;gle++)
-		if(he3d.r.glExts[gle]==ext)
-			return true;
-	return false;
+		if(he3d.r.glExts[gle].indexOf(ext)>-1)
+			return he3d.r.glExts[gle];
+	return null;
+};
+
+he3d.r.getGLExt=function(ext){
+	for(var gle=0;gle<he3d.r.glExts.length;gle++){
+		if(he3d.r.glExts[gle].indexOf(ext)>-1){
+			he3d.log('NOTICE','Found GL Extension:',he3d.r.glExts[gle]);
+			return he3d.gl.getExtension(he3d.r.glExts[gle]);
+		}
+	}
+	he3d.log('WARNING','Failed to find GL Extension:',ext);
+	return null;
 };
 
 he3d.r.throwOnGLError=function(err,funcName,args){
@@ -204,7 +217,7 @@ he3d.r.changeProgram=function(prog){
 		he3d.r.curProgram=he3d.s.shaders[prog];
 		he3d.gl.useProgram(he3d.r.curProgram);
 		
-		if(!he3d.r.curProgram.bound&&he3d.r.curProgram.bind!=null)
+		if((he3d.r.forceRebind||!he3d.r.curProgram.bound)&&he3d.r.curProgram.bind!=null)
 			he3d.r.curProgram.bind();
 	}
 };
@@ -225,7 +238,6 @@ he3d.r.drawFrame=function(){
 		he3d.r.clearColor[2],
 		he3d.r.clearColor[3]
 	);
-//	he3d.gl.clear(he3d.gl.COLOR_BUFFER_BIT|he3d.gl.DEPTH_BUFFER_BIT);
 
 	if(he3d.t.viewer.enabled){
 		he3d.t.viewer.draw();
@@ -237,7 +249,9 @@ he3d.r.drawFrame=function(){
 		
 	he3d.hud.update();
 	if(he3d.hud.mode=='3d')
-		he3d.hud.draw();	
+		he3d.hud.draw();
+
+	he3d.r.forceRebind=false;
 };
 
 he3d.r.fps.update=function(){
@@ -324,9 +338,7 @@ he3d.r.initViewMatrices=function(){
 };
 
 he3d.r.mvPushMatrix=function(){
-	var copy=he3d.m.mat4.create();
-	he3d.m.mat4.set(he3d.r.mvMatrix,copy);
-	he3d.r.mvMatrixStack.push(copy);
+	he3d.r.mvMatrixStack.push(he3d.m.mat4.create(he3d.r.mvMatrix));
 };
 
 he3d.r.mvPopMatrix=function(){
@@ -455,12 +467,29 @@ he3d.r.windowResize=function(e){
 	if(he3d.r.fullscreen){
 		he3d.gl.viewportHeight=he3d.canvas.height=window.innerHeight;
 		he3d.gl.viewportWidth=he3d.canvas.width=window.innerWidth;
+		if(document.getElementById('container')){
+			document.getElementById('container').style.height=he3d.canvas.height;
+			document.getElementById('container').style.width=he3d.canvas.width;
+			document.getElementById('container').style.left='0';
+			document.getElementById('container').style.top='0';
+			document.getElementById('container').style.marginTop='0px';
+			document.getElementById('container').style.marginLeft='0px';
+		}
 	}else{
 		// Nothings changed!
-		if(he3d.canvas.height==he3d.r.windowsize[1]&&he3d.canvas.width==he3d.r.windowsize[0])
+		if(!he3d.canvas.height||(he3d.canvas.height==he3d.r.windowSize[1]
+			&&he3d.canvas.width==he3d.r.windowSize[0]))
 			return;
-		he3d.gl.viewportHeight=he3d.canvas.height=he3d.r.windowsize[1];
-		he3d.gl.viewportWidth=he3d.canvas.width=he3d.r.windowsize[0];
+		he3d.gl.viewportHeight=he3d.canvas.height=he3d.r.windowSize[1];
+		he3d.gl.viewportWidth=he3d.canvas.width=he3d.r.windowSize[0];
+		if(document.getElementById('container')){
+			document.getElementById('container').style.height=he3d.canvas.height;
+			document.getElementById('container').style.width=he3d.canvas.width;
+			document.getElementById('container').style.left='50%';
+			document.getElementById('container').style.top='50%';
+			document.getElementById('container').style.marginTop=-(he3d.canvas.height/2)+"px";
+			document.getElementById('container').style.marginLeft=-(he3d.canvas.width/2)+"px";
+		}
 	}
 
 	he3d.hud.resize();

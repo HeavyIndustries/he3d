@@ -24,8 +24,8 @@ he3d.hud.init=function(){
 	}
 	he3d.hud.size[0]=he3d.canvas.width;
 	he3d.hud.size[1]=he3d.canvas.height;
-	he3d.hud.canvas.setAttribute('width',he3d.hud.size[0]);
 	he3d.hud.canvas.setAttribute('height',he3d.hud.size[1]);
+	he3d.hud.canvas.setAttribute('width',he3d.hud.size[0]);
 
 	he3d.hud.ctx=he3d.hud.canvas.getContext('2d');
 	he3d.hud.ctx.setTransform(1,0,0,1,0,0);
@@ -38,16 +38,16 @@ he3d.hud.resize=function(){
 
 	he3d.hud.size[0]=he3d.canvas.width;
 	he3d.hud.size[1]=he3d.canvas.height;
-	he3d.hud.canvas.setAttribute('width',he3d.hud.size[0]);
 	he3d.hud.canvas.setAttribute('height',he3d.hud.size[1]);
+	he3d.hud.canvas.setAttribute('width',he3d.hud.size[0]);
 };
 
 he3d.hud.update=function(){
 	if(!he3d.hud.enabled)
 		return;
 	
-	var now=he3d.timer.now();
-	if((now-he3d.hud.lastupd)<he3d.hud.updaterate&&!he3d.hud.dirty)
+	this.now=he3d.timer.now();
+	if((this.now-he3d.hud.lastupd)<he3d.hud.updaterate&&!he3d.hud.dirty)
 		return;
 
 	he3d.hud.ctx.setTransform(1,0,0,1,0,0);
@@ -88,7 +88,7 @@ he3d.hud.update=function(){
 	
 	// Set next update flags
 	he3d.hud.dirty=false;
-	he3d.hud.lastupd=now;
+	he3d.hud.lastupd=this.now;
 };
 
 //

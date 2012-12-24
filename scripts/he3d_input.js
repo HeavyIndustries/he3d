@@ -285,7 +285,8 @@ he3d.i.mouseMove=function(e){
 		he3d.i.mouse.delta[1]=e.movementY||e.mozMovementY||e.webkitMovementY||0;
 	} else {
 		he3d.i.mouse.lpos.set(he3d.i.mouse.pos);
-		he3d.i.mouse.pos.set([e.pageX-this.offsetLeft,e.pageY-this.offsetTop]);
+		he3d.i.mouse.pos[0]=e.pageX-this.offsetLeft;
+		he3d.i.mouse.pos[1]=e.pageY-this.offsetTop;
 		he3d.m.vec2.subtract(he3d.i.mouse.pos,he3d.i.mouse.lpos,he3d.i.mouse.delta);
 	}
 };
@@ -303,7 +304,8 @@ he3d.i.initInputManager=function(){
 };
 
 he3d.i.reset=function(){
-	he3d.i.mouse.delta.set([0,0]);
+	he3d.i.mouse.delta[0]=0;
+	he3d.i.mouse.delta[1]=0;
 	he3d.i.mouse.wheel=0;
 };
 
@@ -311,9 +313,11 @@ he3d.i.reset=function(){
 // Pointer Lock API --------------------------------------------------------------------------------
 //
 he3d.i.pointerLock=function(e){
-	if (document.pointerLockElement === he3d.canvas ||
-		document.mozPointerLockElement === he3d.canvas ||
-		document.webkitPointerLockElement === he3d.canvas){
+	if (document.pointerLockElement===he3d.canvas||
+		document.mozPointerLockElement===he3d.canvas||
+		document.webkitPointerLockElement===he3d.canvas){
+		if(he3d.i.pointerLocked)
+			return;
 		document.addEventListener("mousemove", he3d.i.mouseMove,false);
 		he3d.i.pointerLocked=true;
 		he3d.log("NOTICE","Pointer Lock","Enabled");

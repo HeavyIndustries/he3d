@@ -281,7 +281,6 @@ he3d.console.view=document.getElementById('console');
 he3d.console.history=document.getElementById('consolehistory');
 he3d.console.input=document.getElementById('consolecommandline');
 he3d.console.toggle(true);
-he3d.console.initBindings();
 he3d.log('notice','User Agent ...',navigator.userAgent);
 he3d.log('notice','Include Loaded...','Console');
 try{

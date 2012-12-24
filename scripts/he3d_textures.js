@@ -80,6 +80,12 @@ he3d.t.load=function(texture){
 		
 	// Texture Format
 	switch(texture.format){
+		case 'alpha':
+			newtexture.format=he3d.gl.ALPHA;
+			break;
+		case 'depth':
+			newtexture.format=he3d.gl.DEPTH_COMPONENT;
+			break;
 		case 'rgb':
 			newtexture.format=he3d.gl.RGB;
 			break;
@@ -195,7 +201,9 @@ he3d.t.store=function(tid){
 
 	he3d.gl.bindTexture(he3d.gl.TEXTURE_2D,t.texture);
 	he3d.gl.pixelStorei(he3d.gl.UNPACK_FLIP_Y_WEBGL,t.flip);
-	he3d.gl.pixelStorei(he3d.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,he3d.r.glAttribs.premultipledAlpha);
+	if(he3d.r.glAttribs.premultipledAlpha)
+		he3d.gl.pixelStorei(he3d.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,
+			he3d.r.glAttribs.premultipledAlpha);
 	he3d.gl.pixelStorei(he3d.gl.UNPACK_COLORSPACE_CONVERSION_WEBGL,he3d.gl.NONE);
 
 	if(t.type=='canvas'){
@@ -238,7 +246,6 @@ he3d.t.store=function(tid){
 	if(!t.wrap[1])
 		he3d.gl.texParameteri(he3d.gl.TEXTURE_2D,he3d.gl.TEXTURE_WRAP_T,he3d.gl.CLAMP_TO_EDGE);
 
-	
 	t.loaded=true;
 
 	he3d.log('NOTICE',"Loaded Texture("+tid+"):",t.name);
@@ -256,23 +263,12 @@ he3d.t.storeCubeMap=function(tid){
 	he3d.gl.pixelStorei(he3d.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,he3d.r.glAttribs.premultipledAlpha);
 	he3d.gl.pixelStorei(he3d.gl.UNPACK_COLORSPACE_CONVERSION_WEBGL,he3d.gl.NONE);
 
-	he3d.gl.texImage2D(he3d.gl.TEXTURE_CUBE_MAP_POSITIVE_X,0,t.format,
-		t.format,t.stype,t.images[0]);
-
-	he3d.gl.texImage2D(he3d.gl.TEXTURE_CUBE_MAP_NEGATIVE_X,0,t.format,
-		t.format,t.stype,t.images[1]);
-
-	he3d.gl.texImage2D(he3d.gl.TEXTURE_CUBE_MAP_POSITIVE_Y,0,t.format,
-		t.format,t.stype,t.images[2]);
-
-	he3d.gl.texImage2D(he3d.gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,0,t.format,
-		t.format,t.stype,t.images[3]);
-
-	he3d.gl.texImage2D(he3d.gl.TEXTURE_CUBE_MAP_POSITIVE_Z,0,t.format,
-		t.format,t.stype,t.images[4]);
-
-	he3d.gl.texImage2D(he3d.gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,0,t.format,
-		t.format,t.stype,t.images[5]);
+	he3d.gl.texImage2D(he3d.gl.TEXTURE_CUBE_MAP_POSITIVE_X,0,t.format,t.format,t.stype,t.images[0]);
+	he3d.gl.texImage2D(he3d.gl.TEXTURE_CUBE_MAP_NEGATIVE_X,0,t.format,t.format,t.stype,t.images[1]);
+	he3d.gl.texImage2D(he3d.gl.TEXTURE_CUBE_MAP_POSITIVE_Y,0,t.format,t.format,t.stype,t.images[2]);
+	he3d.gl.texImage2D(he3d.gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,0,t.format,t.format,t.stype,t.images[3]);
+	he3d.gl.texImage2D(he3d.gl.TEXTURE_CUBE_MAP_POSITIVE_Z,0,t.format,t.format,t.stype,t.images[4]);
+	he3d.gl.texImage2D(he3d.gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,0,t.format,t.format,t.stype,t.images[5]);
 
 	he3d.gl.texParameteri(he3d.gl.TEXTURE_CUBE_MAP,he3d.gl.TEXTURE_MAG_FILTER,t.filter.mag);
 	he3d.gl.texParameteri(he3d.gl.TEXTURE_CUBE_MAP,he3d.gl.TEXTURE_MIN_FILTER,t.filter.min);
@@ -400,6 +396,8 @@ he3d.t.viewer.draw=function(){
 	he3d.gl.clear(he3d.gl.COLOR_BUFFER_BIT|he3d.gl.DEPTH_BUFFER_BIT);
 
 	he3d.r.changeProgram('postprocessing');
+
+	he3d.gl.enable(he3d.gl.BLEND);
 	
 	he3d.gl.uniform1i(he3d.r.curProgram.uniforms["texture"],he3d.t.viewer.id);
 	he3d.gl.uniform1f(he3d.r.curProgram.uniforms["vignette"],0.0);
@@ -423,6 +421,8 @@ he3d.t.viewer.draw=function(){
 	he3d.gl.bindBuffer(he3d.gl.ELEMENT_ARRAY_BUFFER,he3d.fx.postProcessing.vbo.buf_indices);
 	he3d.gl.drawElements(he3d.fx.postProcessing.vbo.rendertype,
 		he3d.fx.postProcessing.vbo.indices,he3d.gl.UNSIGNED_SHORT,0);
+
+	he3d.gl.disable(he3d.gl.BLEND);
 };
 
 he3d.t.viewer.toggle=function(state){

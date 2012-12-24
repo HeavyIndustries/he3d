@@ -77,7 +77,6 @@ var he3d={
 		// Don't load nogame code unless we need to
 		if(he3d.modules.m[he3d.modules.l]=='he3d_nogame'&&he3d.game!=undefined)
 			he3d.modules.l++;
-		
 		var head=document.getElementsByTagName('head')[0];
 		var script=document.createElement('script');
 		script.type='text/javascript';
@@ -93,6 +92,7 @@ var he3d={
 		if(navigator.userAgent.indexOf('Fennec')>1)
 			he3d.platform='mobile';
 
+		he3d.console.initBindings();
 		he3d.r.init();
 		he3d.contextMenu.init();
 		he3d.i.initBindings();
@@ -101,16 +101,13 @@ var he3d={
 		he3d.a.init();
 		
 		if(!he3d.running)return;
-		he3d.ps.init();
 		if(he3d.game!=undefined){
 			he3d.log('NOTICE','Loading Game:',he3d.game.name);
 			document.title=he3d.game.name+" - Heavy Engine 3D";
 			he3d.mode=he3d.game.loadAssets;
 		} else {
 			document.title="Heavy Engine 3D";
-			he3d.game={
-				loaded:false
-			};
+			he3d.game={loaded:false};
 			he3d.noGame.load();
 			he3d.mode=he3d.noGame.view;
 		}
@@ -129,7 +126,7 @@ var he3d={
 	};
 
 	//
-	// Game Loop -------------------------------------------------------------------------------------
+	// Game Loop -----------------------------------------------------------------------------------
 	//
 	he3d.mainLoop=function(){
 		if(!he3d.running)return;

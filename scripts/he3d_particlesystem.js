@@ -6,7 +6,7 @@ he3d.ps={
 	drawcb:null,
 	max_particles:10000,
 	particles:[],
-	rpos:he3d.m.vec3.create(),
+	rpos:null,
 	total:0,
 	time:0,
 	vbo:{}
@@ -14,10 +14,13 @@ he3d.ps={
 
 he3d.ps.init=function(){
 	he3d.ps.vbo.buf_data=he3d.gl.createBuffer();
-	he3d.s.load({name: 'particle'});
+	he3d.s.load({name:'particle'});
 	he3d.ps.vbo.shader="particle";
+	he3d.ps.rpos=he3d.m.vec3.create();
+	he3d.ps.mvMatrix=he3d.m.mat4.create();
 	he3d.ps.reset();
-	he3d.log('NOTICE','Particle System Initialised:','Max Particles: '+he3d.ps.max_particles);
+	he3d.log('NOTICE','Particle System Initialised:',
+		'Max Particles: '+he3d.ps.max_particles);
 };
 he3d.ps.reset=function(){
 	he3d.ps.vbo.data=new Float32Array(9*he3d.ps.max_particles);
@@ -57,21 +60,21 @@ he3d.ps.add=function(opts){
 		pos[1]+=(Math.random()*p.spread[1]);
 		pos[2]+=(Math.random()*p.spread[2]);
 
-		var pseudocolor={r:p.color.r,g:p.color.g,b:p.color.b,a:p.color.a};
+		var pseudocolor=[p.color.r,p.color.g,p.color.b,p.color.a];
 		if(p.color.pseudo){
 			var pseudonite=Math.random()*1000;
 
 			if(p.color.r>0){
-				pseudonite=pseudonite*16807%2147483647;
-				pseudocolor.r=p.color.r+(pseudonite/2147483647)*0.3;
+				pseudonite=pseudonite*13613 % 393919;
+				pseudocolor[0]=p.color.r+(pseudonite/393919)*0.3;
 			}
 			if(p.color.g>0){
-				pseudonite=pseudonite*16807%2147483647;
-				pseudocolor.g=p.color.g+(pseudonite/2147483647)*0.3;
+				pseudonite=pseudonite*13613 % 393919;
+				pseudocolor[1]=p.color.g+(pseudonite/393919)*0.3;
 			}
 			if(p.color.b>0){
-				pseudonite=pseudonite*16807%2147483647;
-				pseudocolor.b=p.color.b+(pseudonite/2147483647)*0.3;
+				pseudonite=pseudonite*13613 % 393919;
+				pseudocolor[2]=p.color.b+(pseudonite/393919)*0.3;
 			}
 		}
 
@@ -137,20 +140,14 @@ he3d.ps.draw=function(){
 	he3d.gl.uniform1i(he3d.r.curProgram.uniforms['uBlurPass'],he3d.fx.blur.pass);
 	he3d.gl.uniform1i(he3d.r.curProgram.uniforms['uBlur'],he3d.fx.blur.doBlur);
 
-	// Ugh, bit nasty but we might need some external uniforms =(
 	if(he3d.ps.drawcb)
 		he3d.ps.drawcb();
 
 	// Position in World
-	he3d.r.mvPushMatrix();
-		he3d.m.mat4.translate(he3d.r.mvMatrix,he3d.ps.rpos);
-		
-		he3d.gl.uniformMatrix4fv(he3d.r.curProgram.uniforms['uPMatrix'],
-			false,he3d.r.pMatrix);
-		he3d.gl.uniformMatrix4fv(he3d.r.curProgram.uniforms['uMVMatrix'],
-			false,he3d.r.mvMatrix);
-	he3d.r.mvPopMatrix();
-
+	he3d.m.mat4.set(he3d.r.mvMatrix,he3d.ps.mvMatrix);
+	he3d.m.mat4.translate(he3d.ps.mvMatrix,he3d.ps.rpos);
+	he3d.gl.uniformMatrix4fv(he3d.r.curProgram.uniforms['uPMatrix'],false,he3d.r.pMatrix);
+	he3d.gl.uniformMatrix4fv(he3d.r.curProgram.uniforms['uMVMatrix'],false,he3d.ps.mvMatrix);
 	he3d.gl.drawArrays(he3d.gl.POINTS,0,he3d.ps.total/9);
 
 	// Blending

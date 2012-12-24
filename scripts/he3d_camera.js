@@ -100,21 +100,25 @@ he3d.camera.prototype.lookAt=function(dest){
 };
 
 he3d.camera.prototype.readInput=function(){
-	var mod=1;
+	this.mod=1;
 	if(he3d.i.keys[he3d.e.keys.SHIFT])
-		mod=2.5;
+		this.mod=2.5;
 	
-	if(he3d.i.keys[he3d.e.keys.W])this.delta[2]=(this.accel/mod)*he3d.timer.delta;
-	if(he3d.i.keys[he3d.e.keys.S])this.delta[2]=-(this.accel/mod)*he3d.timer.delta;
-	if(he3d.i.keys[he3d.e.keys.A])this.delta[0]=(this.accel/mod)*he3d.timer.delta;
-	if(he3d.i.keys[he3d.e.keys.D])this.delta[0]=-(this.accel/mod)*he3d.timer.delta;
-	if(he3d.i.keys[he3d.e.keys.E])this.delta[1]=(this.accel/mod)*he3d.timer.delta;
-	if(he3d.i.keys[he3d.e.keys.Q])this.delta[1]=-(this.accel/mod)*he3d.timer.delta;
+	if(he3d.i.keys[he3d.e.keys.W])this.delta[2]= (this.accel/this.mod)*he3d.timer.delta;
+	if(he3d.i.keys[he3d.e.keys.S])this.delta[2]=-(this.accel/this.mod)*he3d.timer.delta;
+	if(he3d.i.keys[he3d.e.keys.A])this.delta[0]= (this.accel/this.mod)*he3d.timer.delta;
+	if(he3d.i.keys[he3d.e.keys.D])this.delta[0]=-(this.accel/this.mod)*he3d.timer.delta;
+	if(he3d.i.keys[he3d.e.keys.E])this.delta[1]= (this.accel/this.mod)*he3d.timer.delta;
+	if(he3d.i.keys[he3d.e.keys.Q])this.delta[1]=-(this.accel/this.mod)*he3d.timer.delta;
 	
-	if(he3d.i.keys[he3d.e.keys.LEFT_ARROW])this.angle[1]+=(this.k_turnspeed/mod)*he3d.timer.delta;
-	if(he3d.i.keys[he3d.e.keys.RIGHT_ARROW])this.angle[1]-=(this.k_turnspeed/mod)*he3d.timer.delta;
-	if(he3d.i.keys[he3d.e.keys.DOWN_ARROW])this.angle[0]+=(this.k_turnspeed/mod)*he3d.timer.delta;
-	if(he3d.i.keys[he3d.e.keys.UP_ARROW])this.angle[0]-=(this.k_turnspeed/mod)*he3d.timer.delta;
+	if(he3d.i.keys[he3d.e.keys.LEFT_ARROW])this.angle[1]+=
+		(this.k_turnspeed/this.mod)*he3d.timer.delta;
+	if(he3d.i.keys[he3d.e.keys.RIGHT_ARROW])this.angle[1]-=
+		(this.k_turnspeed/this.mod)*he3d.timer.delta;
+	if(he3d.i.keys[he3d.e.keys.DOWN_ARROW])this.angle[0]+=
+		(this.k_turnspeed/this.mod)*he3d.timer.delta;
+	if(he3d.i.keys[he3d.e.keys.UP_ARROW])this.angle[0]-=
+		(this.k_turnspeed/this.mod)*he3d.timer.delta;
 
 	// Middle Mouse Button Camera Rotation
 	if(he3d.i.pointerLocked||he3d.i.mouse.buttons[he3d.e.mouse.middle]){
@@ -154,24 +158,26 @@ he3d.camera.prototype.update=function(){
 	else if(this.angle[1]<0)this.angle[1]+=360;
 
 	if(this.type=='quat'){
-		var qrot=he3d.m.quat4.eulerAngleCreate(this.angle[0],this.angle[1],0);
-		he3d.m.quat4.multiplyVec3(qrot,this.delta);
-		this.camMat=he3d.m.quat4.toMat4_broke(qrot);
+		this.qrot=he3d.m.quat4.eulerAngleCreate(this.angle[0],this.angle[1],0);
+		he3d.m.quat4.multiplyVec3(this.qrot,this.delta);
+		this.camMat=he3d.m.quat4.toMat4_broke(this.qrot);
 	
 		// Movement
 		this.pos[0]+=this.delta[0];
 		this.pos[1]+=this.delta[1];
 		this.pos[2]+=this.delta[2];
 
-		this.delta.set([0,0,0]);
+		this.delta[0]=0;
+		this.delta[1]=0;
+		this.delta[2]=0;
 	}
 	return this;
 };
 
 he3d.camera.prototype.updateOrtho=function(w,h){
 	if(!w||!h){
-		w=(he3d.r.fullscreen?window.innerWidth:he3d.r.windowsize[0]);
-		h=(he3d.r.fullscreen?window.innerHeight:he3d.r.windowsize[1]);
+		w=(he3d.r.fullscreen?window.innerWidth:he3d.r.windowSize[0]);
+		h=(he3d.r.fullscreen?window.innerHeight:he3d.r.windowSize[1]);
 	}
 	he3d.m.mat4.ortho(-w/2,w/2,-h/2,h/2,this.near,this.far,he3d.r.pMatrix);
 	return this;
@@ -183,8 +189,8 @@ he3d.camera.prototype.updatePerspective=function(){
 			this.aspect=1;
 			break;
 		default:
-			this.aspect=(he3d.r.fullscreen?window.innerWidth:he3d.r.windowsize[0])
-				/(he3d.r.fullscreen?window.innerHeight:he3d.r.windowsize[1]);
+			this.aspect=(he3d.r.fullscreen?window.innerWidth:he3d.r.windowSize[0])
+				/(he3d.r.fullscreen?window.innerHeight:he3d.r.windowSize[1]);
 			break;
 	}
 	he3d.m.mat4.perspective(this.fov,this.aspect,this.near,this.far,he3d.r.pMatrix);
@@ -197,12 +203,12 @@ he3d.camera.prototype.view=function(){
 		he3d.m.mat4.multiply(he3d.r.mvMatrix,this.camMat);
 		he3d.m.mat4.translate(he3d.r.mvMatrix,this.pos);
 	} else {
-		var rotx=this.angle[0]-90; // 0 degrees is Up!
-		if(rotx>360)rotx-=360;
-		else if(rotx<0)rotx+=360;
+		this.rotx=this.angle[0]-90; // 0 degrees is Up!
+		if(this.rotx>360)this.rotx-=360;
+		else if(this.rotx<0)this.rotx+=360;
 			
 		he3d.m.mat4.identity(he3d.r.mvMatrix);
-		he3d.m.mat4.rotateX(he3d.r.mvMatrix,he3d.m.degtorad(rotx));
+		he3d.m.mat4.rotateX(he3d.r.mvMatrix,he3d.m.degtorad(this.rotx));
 		he3d.m.mat4.rotateY(he3d.r.mvMatrix,he3d.m.degtorad(this.angle[1]));
 		he3d.m.mat4.translate(he3d.r.mvMatrix,[
 			-this.pos[0],

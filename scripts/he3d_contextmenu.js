@@ -11,6 +11,7 @@ he3d.contextMenu={
 };
 
 he3d.contextMenu.init=function(){
+	return; //disabled
 	if(!'contextMenu' in document.body){
 		he3d.log('NOTICE',"ContextMenu not supported on this Browser");
 		return;

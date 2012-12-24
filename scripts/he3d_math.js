@@ -4,7 +4,7 @@
 
 if(typeof(he3d)!='object') // Loaded from a worker
 	he3d={};
-else
+else if(he3d.log)
 	he3d.log('notice','Include Loaded...','Math');
 he3d.m={};
 
@@ -351,6 +351,33 @@ he3d.m.mat4.ortho=function(left,right,bottom,top,near,far,dest){
 	dest[15]=1;
 	return dest;
 };
+he3d.m.mat4.makeRotate=function(mat,angle,axis,dest){
+	var x=axis[0],y=axis[1],z=axis[2],
+		s=Math.sin(angle),
+		c=Math.cos(angle),
+		t=1-c,
+		tx=t*x;
+		ty=t*y;
+	if(!dest)
+		dest=mat;
+	dest[0]=tx*x+c;
+	dest[1]=tx*y+s*z;
+	dest[2]=tx*z-s*y;
+	dest[3]=0;
+	dest[4]=tx*y-s*z;
+	dest[5]=ty*y+c;
+	dest[6]=ty*z+s*x;
+	dest[7]=0;
+	dest[8]=tx*z+s*y;
+	dest[9]=ty*z-x*s;
+	dest[10]=t*z*z+c;
+	dest[11]=0;
+	dest[12]=0;
+	dest[13]=0;
+	dest[14]=0;
+	dest[15]=1;
+	return dest;
+};
 he3d.m.mat4.rotate=function(mat,angle,axis,dest){
 	var x=axis[0],y=axis[1],z=axis[2],
 		len=Math.sqrt(x*x+y*y+z*z),
@@ -537,42 +564,39 @@ he3d.m.mat4.translate=function(mat,vec,dest){
 	return dest;
 };
 he3d.m.mat4.transpose=function(mat,dest){
-	if (!dest || mat === dest) {
-		var a01 = mat[1], a02 = mat[2], a03 = mat[3],
-			a12 = mat[6], a13 = mat[7],
-			a23 = mat[11];
-
-		mat[1] = mat[4];
-		mat[2] = mat[8];
-		mat[3] = mat[12];
-		mat[4] = a01;
-		mat[6] = mat[9];
-		mat[7] = mat[13];
-		mat[8] = a02;
-		mat[9] = a12;
-		mat[11] = mat[14];
-		mat[12] = a03;
-		mat[13] = a13;
-		mat[14] = a23;
+	if(!dest||mat===dest){
+		var a01=mat[1],a02=mat[2],a03=mat[3],
+			a12=mat[6],a13=mat[7],a23=mat[11];
+		mat[1]=mat[4];
+		mat[2]=mat[8];
+		mat[3]=mat[12];
+		mat[4]=a01;
+		mat[6]=mat[9];
+		mat[7]=mat[13];
+		mat[8]=a02;
+		mat[9]=a12;
+		mat[11]=mat[14];
+		mat[12]=a03;
+		mat[13]=a13;
+		mat[14]=a23;
 		return mat;
 	}
-
-	dest[0] = mat[0];
-	dest[1] = mat[4];
-	dest[2] = mat[8];
-	dest[3] = mat[12];
-	dest[4] = mat[1];
-	dest[5] = mat[5];
-	dest[6] = mat[9];
-	dest[7] = mat[13];
-	dest[8] = mat[2];
-	dest[9] = mat[6];
-	dest[10] = mat[10];
-	dest[11] = mat[14];
-	dest[12] = mat[3];
-	dest[13] = mat[7];
-	dest[14] = mat[11];
-	dest[15] = mat[15];
+	dest[0]=mat[0];
+	dest[1]=mat[4];
+	dest[2]=mat[8];
+	dest[3]=mat[12];
+	dest[4]=mat[1];
+	dest[5]=mat[5];
+	dest[6]=mat[9];
+	dest[7]=mat[13];
+	dest[8]=mat[2];
+	dest[9]=mat[6];
+	dest[10]=mat[10];
+	dest[11]=mat[14];
+	dest[12]=mat[3];
+	dest[13]=mat[7];
+	dest[14]=mat[11];
+	dest[15]=mat[15];
 	return dest;
 };
 
@@ -580,13 +604,18 @@ he3d.m.mat4.transpose=function(mat,dest){
 // Quaternions -------------------------------------------------------------------------------------
 //
 he3d.m.quat4={};
-he3d.m.quat4.axisAngleCreate=function(x,y,z,angle){
+he3d.m.quat4.axisAngleCreate=function(x,y,z,angle,dest){
+	if(!dest)dest=he3d.m.vec4.create();
 	var a2=angle/2.0;
 	var sin2=Math.sin(a2);
-	return new Float32Array([x*sin2,y*sin2,z*sin2,Math.cos(a2)]);
+	dest[3]=Math.cos(a2);	// w
+	dest[0]=x*sin2;			// x
+	dest[1]=y*sin2;			// y
+	dest[2]=z*sin2;			// z
+	return dest;
 };
-he3d.m.quat4.eulerAngleCreate=function(x,y,z){
-	var q=[0,0,0,0];
+he3d.m.quat4.eulerAngleCreate=function(x,y,z,dest){
+	if(!dest)dest=he3d.m.vec4.create();
 	var radiansX=he3d.m.degtorad(x);
 	var radiansY=he3d.m.degtorad(y);
 	var radiansZ=he3d.m.degtorad(z);
@@ -598,12 +627,12 @@ he3d.m.quat4.eulerAngleCreate=function(x,y,z){
 	var sZ=Math.sin(radiansZ*0.5);
 
 	// XYZ
-	q[3]=cX*cY*cZ+sX*sY*sZ;	// w
-	q[0]=sX*cY*cZ-cX*sY*sZ;	// x
-	q[1]=cX*sY*cZ+sX*cY*sZ;	// y
-	q[2]=cX*cY*sZ-sX*sY*cZ;	// z
+	dest[3]=cX*cY*cZ+sX*sY*sZ;	// w
+	dest[0]=sX*cY*cZ-cX*sY*sZ;	// x
+	dest[1]=cX*sY*cZ+sX*cY*sZ;	// y
+	dest[2]=cX*cY*sZ-sX*sY*cZ;	// z
 
-	return q;
+	return dest;
 };
 he3d.m.quat4.fromAngleAxis=function(angle,axis,dest){
 	if(!dest)dest=he3d.m.vec4.create();
@@ -997,13 +1026,30 @@ he3d.m.vec4.create=function(vec){
 //
 
 //
-// Axis Aligned Bounding Box vs Sphere
-//	- p box position
-//	- aabb bounding box
-//	- sp sphere position
-//	- sr sphere radius
+// Axis Aligned Bounding Box vs Axis Aligned Bounding Box
+//	- Position
+//	- Bounding Box Dimensions
+//	- Target Position
+//	- Target Bounding Box Dimensions
 //
-he3d.m.AABBvsSphere=function(p,aabb,sp,sr){
+he3d.m.AABBvsAABB=function(p,bb,p2,bb2){
+	if(p[0]+bb.x.max<p2[0]-bb2.x.min)return false;
+	if(p[0]-bb.x.min>p2[0]+bb2.x.max)return false;
+	if(p[1]+bb.y.max<p2[1]-bb2.y.min)return false;
+	if(p[1]-bb.y.min>p2[1]+bb2.y.max)return false;
+	if(p[2]+bb.z.max<p2[2]-bb2.z.min)return false;
+	if(p[2]-bb.z.min>p2[2]+bb2.z.max)return false;
+	return true;
+};
+
+//
+// Axis Aligned Bounding Box vs Sphere
+//	- Position
+//	- Bounding Box Dimensions
+//	- Target Sphere position
+//	- Target Sphere radius
+//
+he3d.m.AABBvsSphere=function(p,bb,sp,sr){
 	var sepAxis=he3d.m.vec3.create();
 	if(he3d.m.vec3.length(p)<he3d.m.vec3.length(sp))
 		he3d.m.vec3.subtract(sp,p,sepAxis);
@@ -1027,9 +1073,9 @@ he3d.m.AABBvsSphere=function(p,aabb,sp,sr){
 		sepAxis[2]/=sepAxis[2];
 	}
 
-	sepAxis[0]*=(Math.abs(aabb.x.min-aabb.x.max))/2;
-	sepAxis[1]*=(Math.abs(aabb.y.min-aabb.y.max))/2;
-	sepAxis[2]*=(Math.abs(aabb.z.min-aabb.z.max))/2;
+	sepAxis[0]*=(Math.abs(bb.x.min-bb.x.max))/2;
+	sepAxis[1]*=(Math.abs(bb.y.min-bb.y.max))/2;
+	sepAxis[2]*=(Math.abs(bb.z.min-bb.z.max))/2;
 		
 	if(dist<=(sr+he3d.m.vec3.length(sepAxis)))
 		return true;
@@ -1038,40 +1084,55 @@ he3d.m.AABBvsSphere=function(p,aabb,sp,sr){
 
 //
 // Point vs AABB
-//
-he3d.m.pointvsAABB=function(p,aabbp,aabb){
-	return (p[0]>aabbp[0]+aabb.x.min&&p[0]<aabbp[0]+aabb.x.max)&&
-		(p[1]>aabbp[1]+aabb.y.min&&p[1]<aabbp[1]+aabb.y.max)&&
-		(p[2]>aabbp[2]+aabb.z.min&&p[2]<aabbp[2]+aabb.z.max);
+// 	- Point
+//	- Target Position
+//	- Target Bounding Box Dimensions
+he3d.m.pointvsAABB=function(point,p,bb){
+	return (point[0]>p[0]+bb.x.min&&point[0]<p[0]+bb.x.max)&&
+		(point[1]>p[1]+bb.y.min&&point[1]<p[1]+bb.y.max)&&
+		(point[2]>p[2]+bb.z.min&&point[2]<p[2]+bb.z.max);
 };
 
 //
 // Point vs Sphere
-//
-he3d.m.pointvsSphere=function(p,sp,sr){
-	if(he3d.m.vec3.dist(p,sp)<=sr)
+// 	- Point
+//	- Target Sphere Position
+//	- Target Sphere Radius
+he3d.m.pointvsSphere=function(point,p,sr){
+	if(he3d.m.vec3.dist(point,p)<=sr)
 		return true;
 	return false;
 };
 
-
 //
-// Quick and dirty maths.
+// Oriented Bounding Box vs Oriented Bounding Box
 //
-
-he3d.m.dirtycos = function(x) {
-  var x2 = x*x,
-      x4 = x2*x2,
-      x6 = x4*x2,
-      x8 = x6*x2;
-  return 1
-         - x2 / 2
-         + x4 / 24
-         - x6 / 720
-         + x8 / 40824;
+he3d.m.OBBvsOBB=function(p,r,bb,p2,r2,bb2){
+	// Step 1: Recalculate both bounding boxes (should this be done here?)
+	// Step 2: SAT stuff
+	// Step 3: Test resulting axis
+	// Step 4: ...
+	// Step 5: Profit
+	return (Math.round(Math.random())?true:false); // Fair dice roll
 };
 
 
+//
+// Quick and dirty maths ---------------------------------------------------------------------------
+//
+
+he3d.m.dirtycos=function(x){
+  var x2=x*x,
+      x4=x2*x2,
+      x6=x4*x2,
+      x8=x6*x2;
+  return 1
+         -x2/2
+         +x4/24
+         -x6/720
+         +x8/40824;
+};
+
 he3d.m.dirtysin=function(x){
-	return he3d.m.dirtycos (x + 1.570796326794896);
+	return he3d.m.dirtycos(x+1.570796326794896);
 };

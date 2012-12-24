@@ -88,7 +88,7 @@ he3d.s.checkQueue=function(){
 			for(var a in attribs){
 				if((newShader.attributes[attribs[a]]=he3d.gl.getAttribLocation(
 					newShader,attribs[a]))==-1){
-					he3d.log('WARNING','invalid Attribute location for:',attribs[a]);
+					he3d.log('WARNING','['+s+'] invalid Attribute location for:',attribs[a]);
 				}
 			};
 			he3d.log('NOTICE',"Shader Attributes ["+s+"]:",attribs.length);
@@ -101,7 +101,7 @@ he3d.s.checkQueue=function(){
 			for(var u in uniforms){
 				if((newShader.uniforms[uniforms[u]]=he3d.gl.getUniformLocation(
 					newShader,uniforms[u]))==-1){
-					he3d.log('WARNING','invalid Uniform location for:',uniforms[u]);
+					he3d.log('WARNING','['+s+'] invalid Uniform location for:',uniforms[u]);
 				}
 			};
 			he3d.log('NOTICE',"Shader Uniforms ["+s+"]:",uniforms.length);

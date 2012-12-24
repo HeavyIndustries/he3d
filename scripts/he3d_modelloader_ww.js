@@ -2,6 +2,7 @@
 // Model Loader Web Worker
 //
 importScripts('he3d_tools.js');
+importScripts('he3d_math.js');
 importScripts('lib/jdataview.js');
 he3d.modelLoader={};
 he3d.log=function(){
@@ -344,7 +345,7 @@ he3d.modelLoader.obj.getRawData=function(obj,objfile){
 				});
 				break;			
 			case 'usemtl':
-				mat=lines[l].split(" ")[1].replace(/\r/g,'');
+				mat=lines[l].replace('usemtl ','').replace(/\r/g,'');
 				break;
 			case 'o':
 				var n=lines[l].split(" ");
@@ -373,7 +374,7 @@ he3d.modelLoader.obj.getMaterials=function(obj,mtl){
 				trans=lines[l].split(" ")[1].replace(/\r/g,'');
 				break;
 			case 'newmtl':
-				mat=lines[l].split(" ")[1].replace(/\r/g,'');
+				mat=lines[l].replace('newmtl ','').replace(/\r/g,'');
 				break;
 			case 'Kd':
 				var color=lines[l].substr(3).replace(/\r/g,'');
@@ -436,6 +437,7 @@ he3d.modelLoader.obj.compile=function(filename,objfile,mtlfile,bbt,diFormat,fram
 		depth:0
 	};
 	var name='';
+	var color;
 	for(var i=0;i<obj.indices.length;i++){
 		if(name!=obj.indices[i].oname)
 			name=obj.indices[i].oname;
@@ -528,10 +530,8 @@ he3d.modelLoader.obj.compile=function(filename,objfile,mtlfile,bbt,diFormat,fram
 
 	// Data Interleaving
 	var data;
-	if(diFormat.toLowerCase()=='detect'){
-		if(obj.efx.length)
-			diFormat='vncte';
-	}
+	if(diFormat.toLowerCase()=='detect'&&obj.efx.length)
+		diFormat='vncte';
 	
 	switch(diFormat.toLowerCase()){
 		default:
@@ -589,8 +589,8 @@ he3d.modelLoader.obj.compileAnimation=function(frames){
 	// Sort frames by filename
 	frames.sort(function(a,b){
 		var f1=a.filename.toLowerCase(),f2=b.filename.toLowerCase();
-		if (f1<f2)return -1;
-		if (f1>f2)return 1;
+		if(f1<f2)return -1;
+		if(f1>f2)return 1;
 		return 0;
 	});
 	
@@ -603,7 +603,8 @@ he3d.modelLoader.obj.compileAnimation=function(frames){
 			frames[frame].colors,frames[frame].texcoords]));
 
 	}
-	he3d.log("NOTICE","Animated OBJ ("+frames[0].filename+") Loaded","Frame Count: "+frames.length);
+	he3d.log("NOTICE","Animated OBJ ("+frames[0].filename+
+		") Loaded","Frame Count: "+frames.length);
 	
 	postMessage({
 		'frames':data,
