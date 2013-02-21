@@ -11,8 +11,8 @@ he3d.m={};
 //
 // Conversion --------------------------------------------------------------------------------------
 //
-he3d.m.degtorad=function(deg){return deg*(Math.PI/180);};
-he3d.m.radtodeg=function(rad){return rad*(180/Math.PI);};
+he3d.m.degtorad=function(deg){return deg*(0.017453292519943295);};
+he3d.m.radtodeg=function(rad){return rad*(57.29577951308232);};
 
 //
 // Test --------------------------------------------------------------------------------------------
@@ -61,11 +61,11 @@ he3d.m.mat3.create=function(mat){
 		dest[6]=mat[6];
 		dest[7]=mat[7];
 		dest[8]=mat[8];
-	}	
+	}
 	return dest;
 };
 he3d.m.mat3.transpose=function(mat,dest){
-	if(!dest||mat==dest){ 
+	if(!dest||mat==dest){
 		var a01=mat[1],a02=mat[2],a12=mat[5];
 		mat[1]=mat[3];
 		mat[2]=mat[6];
@@ -137,6 +137,7 @@ he3d.m.mat4.frustum=function(left,right,bottom,top,near,far,dest){
 	return dest;
 };
 he3d.m.mat4.identity=function(dest){
+	if(!dest){dest=he3d.m.mat4.create();}
 	dest[0]=1;
 	dest[1]=0;
 	dest[2]=0;
@@ -155,7 +156,7 @@ he3d.m.mat4.identity=function(dest){
 	dest[15]=1;
 	return dest;
 };
-he3d.m.mat4.inverse=function(mat,dest){	
+he3d.m.mat4.inverse=function(mat,dest){
 	if(!dest){dest=mat;}
 	var a00=mat[0], a01=mat[1], a02=mat[2], a03=mat[3],
 		a10=mat[4], a11=mat[5], a12=mat[6], a13=mat[7],
@@ -189,7 +190,7 @@ he3d.m.mat4.inverse=function(mat,dest){
 	dest[12]=(-a10*b09+a11*b07-a12*b06)*invDet;
 	dest[13]=(a00*b09-a01*b07+a02*b06)*invDet;
 	dest[14]=(-a30*b03+a31*b01-a32*b00)*invDet;
-	dest[15]=(a20*b03-a21*b01+a22*b00)*invDet;	
+	dest[15]=(a20*b03-a21*b01+a22*b00)*invDet;
 	return dest;
 };
 he3d.m.mat4.toInverseMat3=function(mat,dest) {
@@ -388,7 +389,7 @@ he3d.m.mat4.rotate=function(mat,angle,axis,dest){
 		b00,b01,b02,
 		b10,b11,b12,
 		b20,b21,b22;
-	
+
 	if(!len){return null;}
 	if(len!==1){
 		len=1/len;
@@ -396,19 +397,19 @@ he3d.m.mat4.rotate=function(mat,angle,axis,dest){
 		y*=len;
 		z*=len;
 	}
-	
+
 	s=Math.sin(angle);
 	c=Math.cos(angle);
 	t=1-c;
-	
+
 	a00=mat[0];a01=mat[1];a02=mat[2];a03=mat[3];
 	a10=mat[4];a11=mat[5];a12=mat[6];a13=mat[7];
 	a20=mat[8];a21=mat[9];a22=mat[10];a23=mat[11];
-	
+
 	b00=x*x*t+c;b01=y*x*t+z*s;b02=z*x*t-y*s;
 	b10=x*y*t-z*s;b11=y*y*t+c;b12=z*y*t+x*s;
 	b20=x*z*t+y*s;b21=y*z*t-x*s;b22=z*z*t+c;
-	
+
 	if(!dest){
 		dest=mat;
 	}else if(mat!==dest){
@@ -421,12 +422,12 @@ he3d.m.mat4.rotate=function(mat,angle,axis,dest){
 	dest[1]=a01*b00+a11*b01+a21*b02;
 	dest[2]=a02*b00+a12*b01+a22*b02;
 	dest[3]=a03*b00+a13*b01+a23*b02;
-	
+
 	dest[4]=a00*b10+a10*b11+a20*b12;
 	dest[5]=a01*b10+a11*b11+a21*b12;
 	dest[6]=a02*b10+a12*b11+a22*b12;
 	dest[7]=a03*b10+a13*b11+a23*b12;
-	
+
 	dest[8]=a00*b20+a10*b21+a20*b22;
 	dest[9]=a01*b20+a11*b21+a21*b22;
 	dest[10]=a02*b20+a12*b21+a22*b22;
@@ -439,7 +440,7 @@ he3d.m.mat4.rotateX=function(mat,angle,dest){
 		a10=mat[4],a11=mat[5],a12=mat[6],a13=mat[7],
 		a20=mat[8],a21=mat[9],a22=mat[10],a23=mat[11];
 	if(!dest){
-		dest=mat; 
+		dest=mat;
 	}else if(mat!=dest){
 		dest[0]=mat[0];
 		dest[1]=mat[1];
@@ -465,7 +466,7 @@ he3d.m.mat4.rotateY=function(mat,angle,dest){
 		c=Math.cos(angle),
 		a00=mat[0],a01=mat[1],a02=mat[2],a03=mat[3],
 		a20=mat[8],a21=mat[9],a22=mat[10],a23=mat[11];
-	if(!dest){ 
+	if(!dest){
 		dest=mat;
 	}else if(mat!=dest){
 		dest[4]=mat[4];
@@ -476,7 +477,7 @@ he3d.m.mat4.rotateY=function(mat,angle,dest){
 		dest[13]=mat[13];
 		dest[14]=mat[14];
 		dest[15]=mat[15];
-	}	
+	}
 	dest[0]=a00*c+a20*-s;
 	dest[1]=a01*c+a21*-s;
 	dest[2]=a02*c+a22*-s;
@@ -492,7 +493,7 @@ he3d.m.mat4.rotateZ=function(mat,angle,dest){
 		c=Math.cos(angle),
 		a00=mat[0],a01=mat[1],a02=mat[2],a03=mat[3],
 		a10=mat[4],a11=mat[5],a12=mat[6],a13=mat[7];
-	if(!dest){ 
+	if(!dest){
 		dest=mat;
 	}else if(mat!=dest){
 		dest[8]=mat[8];
@@ -512,6 +513,41 @@ he3d.m.mat4.rotateZ=function(mat,angle,dest){
 	dest[5]=a01*-s+a11*c;
 	dest[6]=a02*-s+a12*c;
 	dest[7]=a03*-s+a13*c;
+	return dest;
+};
+he3d.m.mat4.scale=function(mat,vec,dest) {
+	var x=vec[0],y=vec[1],z=vec[2];
+	if(!dest||mat===dest){
+		mat[0]*=x;
+		mat[1]*=x;
+		mat[2]*=x;
+		mat[3]*=x;
+		mat[4]*=y;
+		mat[5]*=y;
+		mat[6]*=y;
+		mat[7]*=y;
+		mat[8]*=z;
+		mat[9]*=z;
+		mat[10]*=z;
+		mat[11]*=z;
+		return mat;
+	}
+	dest[0]=mat[0]*x;
+	dest[1]=mat[1]*x;
+	dest[2]=mat[2]*x;
+	dest[3]=mat[3]*x;
+	dest[4]=mat[4]*y;
+	dest[5]=mat[5]*y;
+	dest[6]=mat[6]*y;
+	dest[7]=mat[7]*y;
+	dest[8]=mat[8]*z;
+	dest[9]=mat[9]*z;
+	dest[10]=mat[10]*z;
+	dest[11]=mat[11]*z;
+	dest[12]=mat[12];
+	dest[13]=mat[13];
+	dest[14]=mat[14];
+	dest[15]=mat[15];
 	return dest;
 };
 he3d.m.mat4.set=function(copy,dest){
@@ -621,7 +657,7 @@ he3d.m.quat4.eulerAngleCreate=function(x,y,z,dest){
 	var radiansZ=he3d.m.degtorad(z);
 	var cX=Math.cos(radiansX*0.5);
 	var cY=Math.cos(radiansY*0.5);
-	var cZ=Math.cos(radiansZ*0.5);	
+	var cZ=Math.cos(radiansZ*0.5);
 	var sX=Math.sin(radiansX*0.5);
 	var sY=Math.sin(radiansY*0.5);
 	var sZ=Math.sin(radiansZ*0.5);
@@ -754,17 +790,14 @@ he3d.m.quat4.toMat4=function(quat,dest){
 	dest[1]=xy+wz;
 	dest[2]=xz-wy;
 	dest[3]=0;
-	
 	dest[4]=xy-wz;
 	dest[5]=1-(xx+zz);
 	dest[6]=yz+wx;
 	dest[7]=0;
-	
 	dest[8]=xz+wy;
 	dest[9]=yz-wx;
 	dest[10]=1-(xx+yy);
 	dest[11]=0;
-	
 	dest[12]=0;
 	dest[13]=0;
 	dest[14]=0;
@@ -927,7 +960,7 @@ he3d.m.vec3.multiply=function(vec,vec2,dest){
 		vec[1]*=vec2[1];
 		vec[2]*=vec2[2];
 		return vec;
-	}	
+	}
 	dest[0]=vec[0]*vec2[0];
 	dest[1]=vec[1]*vec2[1];
 	dest[2]=vec[2]*vec2[2];
@@ -954,7 +987,7 @@ he3d.m.vec3.normalize=function(vec,dest){
 		dest[1]=y;
 		dest[2]=z;
 		return dest;
-	}	
+	}
 	len=1/len;
 	dest[0]=x*len;
 	dest[1]=y*len;
@@ -962,8 +995,8 @@ he3d.m.vec3.normalize=function(vec,dest){
 	return dest;
 };
 he3d.m.vec3.rotationTo=function (a, b, dest) {
-	if (!dest) { dest = he3d.m.quat4.create(); }
-	
+	if (!dest) { dest = he3d.m.vec4.create(); }
+
 	var d = he3d.m.vec3.dot(a, b);
 	var axis = he3d.m.vec3.create();;
 	if (d >= 1.0) {
@@ -1002,7 +1035,7 @@ he3d.m.vec3.subtract=function(vec,vec2,dest){
 		vec[1]-=vec2[1];
 		vec[2]-=vec2[2];
 		return vec;
-	}	
+	}
 	dest[0]=vec[0]-vec2[0];
 	dest[1]=vec[1]-vec2[1];
 	dest[2]=vec[2]-vec2[2];
@@ -1033,12 +1066,12 @@ he3d.m.vec4.create=function(vec){
 //	- Target Bounding Box Dimensions
 //
 he3d.m.AABBvsAABB=function(p,bb,p2,bb2){
-	if(p[0]+bb.x.max<p2[0]-bb2.x.min)return false;
-	if(p[0]-bb.x.min>p2[0]+bb2.x.max)return false;
-	if(p[1]+bb.y.max<p2[1]-bb2.y.min)return false;
-	if(p[1]-bb.y.min>p2[1]+bb2.y.max)return false;
-	if(p[2]+bb.z.max<p2[2]-bb2.z.min)return false;
-	if(p[2]-bb.z.min>p2[2]+bb2.z.max)return false;
+	if(p[0]+bb.x.max<p2[0]+bb2.x.min)return false;
+	if(p[0]+bb.x.min>p2[0]+bb2.x.max)return false;
+	if(p[1]+bb.y.max<p2[1]+bb2.y.min)return false;
+	if(p[1]+bb.y.min>p2[1]+bb2.y.max)return false;
+	if(p[2]+bb.z.max<p2[2]+bb2.z.min)return false;
+	if(p[2]+bb.z.min>p2[2]+bb2.z.max)return false;
 	return true;
 };
 
@@ -1062,7 +1095,7 @@ he3d.m.AABBvsSphere=function(p,bb,sp,sr){
 	if(sepAxis[0]>=sepAxis[1]&&sepAxis[0]>=sepAxis[2]){
 		sepAxis[0]/=sepAxis[0];
 		sepAxis[1]/=sepAxis[0];
-		sepAxis[2]/=sepAxis[0];	
+		sepAxis[2]/=sepAxis[0];
 	}else if(sepAxis[1]>=sepAxis[0]&&sepAxis[1]>=sepAxis[2]){
 		sepAxis[0]/=sepAxis[1];
 		sepAxis[1]/=sepAxis[1];
@@ -1076,7 +1109,7 @@ he3d.m.AABBvsSphere=function(p,bb,sp,sr){
 	sepAxis[0]*=(Math.abs(bb.x.min-bb.x.max))/2;
 	sepAxis[1]*=(Math.abs(bb.y.min-bb.y.max))/2;
 	sepAxis[2]*=(Math.abs(bb.z.min-bb.z.max))/2;
-		
+
 	if(dist<=(sr+he3d.m.vec3.length(sepAxis)))
 		return true;
 	return false;
@@ -1087,6 +1120,7 @@ he3d.m.AABBvsSphere=function(p,bb,sp,sr){
 // 	- Point
 //	- Target Position
 //	- Target Bounding Box Dimensions
+//
 he3d.m.pointvsAABB=function(point,p,bb){
 	return (point[0]>p[0]+bb.x.min&&point[0]<p[0]+bb.x.max)&&
 		(point[1]>p[1]+bb.y.min&&point[1]<p[1]+bb.y.max)&&
@@ -1098,6 +1132,7 @@ he3d.m.pointvsAABB=function(point,p,bb){
 // 	- Point
 //	- Target Sphere Position
 //	- Target Sphere Radius
+//
 he3d.m.pointvsSphere=function(point,p,sr){
 	if(he3d.m.vec3.dist(point,p)<=sr)
 		return true;
@@ -1116,23 +1151,54 @@ he3d.m.OBBvsOBB=function(p,r,bb,p2,r2,bb2){
 	return (Math.round(Math.random())?true:false); // Fair dice roll
 };
 
+//
+// DOP vs DOP
+// 	- DOP1
+//	- DOP2
+//	- Size of DOP
+//
+he3d.m.DOPvsDOP=function(d1,d2,k){
+	for(var d=0;d<k/2;d++)
+		if(d1.min[d]>d2.max[d]||d1.max[d]<d2.min[d])
+			return false;
+	return true;
+};
+
+he3d.m.DOP18_NORMALS=[
+	[1,0,0],[0,1,0],[0,0,1],							// AABB
+	[1,1,0],[1,0,1],[0,1,1],[1,-1,0],[1,0,-1],[0,1,-1]	// Edges
+];
 
 //
 // Quick and dirty maths ---------------------------------------------------------------------------
+// Come back old dirty maths... all is forgiven.
 //
-
+const pc0= 0.99999999978;
+const pc1=-0.49999999358;
+const pc2= 0.04166663626;
+const pc3=-0.00138883614;
+const pc4= 0.0000247601614;
+const pc5=-0.000000260515;
+const pi2=1.570796326794896;
 he3d.m.dirtycos=function(x){
-  var x2=x*x,
-      x4=x2*x2,
-      x6=x4*x2,
-      x8=x6*x2;
-  return 1
-         -x2/2
-         +x4/24
-         -x6/720
-         +x8/40824;
+	var tmp_x,frac,quad,y;
+	var t=0;
+	tmp_x = x;
+	if (x < 0) tmp_x=-tmp_x;
+	quad = (tmp_x/pi2)|0;
+	frac= (tmp_x/pi2) - quad;
+	switch(quad){
+		case 0: t=frac * pi2; break;
+		case 1: t=(1-frac) * pi2; break;
+		case 2: t=frac * pi2; break;
+		case 3: t=(frac-1) * pi2; break;
+	}
+	t=t*t;
+	y=pc0+(pc1*t)+(pc2*t*t)+(pc3*t*t*t)+(pc4*t*t*t*t)+(pc5*t*t*t*t*t);
+	if(quad==2||quad==1)y=-y;
+	return y;
 };
 
 he3d.m.dirtysin=function(x){
-	return he3d.m.dirtycos(x+1.570796326794896);
+	return he3d.m.dirtycos(x-1.570796326794896);
 };

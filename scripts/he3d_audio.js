@@ -44,10 +44,10 @@ he3d.a.load=function(sound){
 			f.pop();
 			sound.name=f.join('.');
 		}
-	}		
+	}
 	newsound.name=sound.name;
 	newsound.type=sound.type;
-	
+
 	switch(sound.type){
 		case 'ogg':
 		case 'wav':
@@ -72,7 +72,7 @@ he3d.a.load=function(sound){
 						this.play();
 					},false);
 				}
-			}			
+			}
 			newsound.sound.volume=newsound.volume*he3d.a.volume;
 			break;
 	}
@@ -152,7 +152,7 @@ he3d.a.setVolume=function(volume){
 		return;
 	}
 	he3d.a.volume=(new Number(volume)).toFixed(2);
-	
+
 	for(var s=0;s<he3d.a.sounds.length;s++)
 		he3d.a.sounds[s].sound.volume=he3d.a.sounds[s].volume*he3d.a.volume;
 	he3d.log('NOTICE','New Volume Level:',he3d.a.volume);

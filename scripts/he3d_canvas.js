@@ -12,9 +12,9 @@ CanvasRenderingContext2D.prototype.progressBar=function(s){
 		pad:4
 	};
 	for(var a in s){opts[a]=s[a];}
-	
+
 	var gval=(opts.pmax/opts.width)*100;
-	var bval=(opts.pval/gval)*100;	
+	var bval=(opts.pval/gval)*100;
 
 	if(isNaN(bval)||bval<opts.pad)bval=opts.pad;
 

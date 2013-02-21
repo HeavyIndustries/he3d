@@ -125,6 +125,8 @@ he3d.i={
 	keys:[],
 	mouse:{
 		buttons:[],
+		buf:[[0,0],[0,0]],
+		bufi:0,
 		delta:[0,0],
 		invert:false,
 		lpos:[0,0],
@@ -147,7 +149,7 @@ he3d.i.initBindings=function(){
 		document.addEventListener('mozpointerlockerror',he3d.i.pointerLockError,false);
 		document.addEventListener('webkitpointerlockerror',he3d.i.pointerLockError,false);
 	}
-		
+
 	//
 	// Keyboard
 	//
@@ -198,7 +200,7 @@ he3d.i.initBindings=function(){
 				case he3d.e.keys.LEFT_ARROW:
 					var t=he3d.t.viewer.id-1;
 					if(t<0)
-						break;						
+						break;
 					he3d.log('NOTICE','Viewing Texture:',t+": "+
 						he3d.t.textures[t].name+' ['+he3d.t.textures[t].type+']'+
 						(he3d.t.textures[t].width?' ['+he3d.t.textures[t].width+','+
@@ -211,7 +213,7 @@ he3d.i.initBindings=function(){
 				case he3d.e.keys.RIGHT_ARROW:
 					var t=he3d.t.viewer.id+1;
 					if(t>he3d.t.textures.length-1)
-						break;						
+						break;
 					he3d.log('NOTICE','Viewing Texture:',t+": "+
 						he3d.t.textures[t].name+' ['+he3d.t.textures[t].type+']'+
 						(he3d.t.textures[t].width?' ['+he3d.t.textures[t].width+','+
@@ -268,7 +270,7 @@ he3d.i.initBindings=function(){
 		if(e.detail)he3d.i.mouse.wheel=-e.detail/3;
 	};
 	he3d.canvas.addEventListener('DOMMouseScroll',he3d.canvas.onmousewheel,false);
-	
+
 	//
 	// Gamepad
 	//
@@ -281,8 +283,15 @@ he3d.i.initBindings=function(){
 
 he3d.i.mouseMove=function(e){
 	if(he3d.i.pointerLocked){
-		he3d.i.mouse.delta[0]=e.movementX||e.mozMovementX||e.webkitMovementX||0;
-		he3d.i.mouse.delta[1]=e.movementY||e.mozMovementY||e.webkitMovementY||0;
+		he3d.i.mouse.buf[he3d.i.mouse.bufi][0]+=e.movementX||e.mozMovementX||e.webkitMovementX||0;
+		he3d.i.mouse.buf[he3d.i.mouse.bufi][1]+=e.movementY||e.mozMovementY||e.webkitMovementY||0;
+
+		he3d.i.mouse.delta[0]=(he3d.i.mouse.buf[0][0]+he3d.i.mouse.buf[1][0])*0.5;
+		he3d.i.mouse.delta[1]=(he3d.i.mouse.buf[0][1]+he3d.i.mouse.buf[1][1])*0.5;
+
+		he3d.i.mouse.bufi^=1;
+		he3d.i.mouse.buf[he3d.i.mouse.bufi][0]=0;
+		he3d.i.mouse.buf[he3d.i.mouse.bufi][1]=0;
 	} else {
 		he3d.i.mouse.lpos.set(he3d.i.mouse.pos);
 		he3d.i.mouse.pos[0]=e.pageX-this.offsetLeft;

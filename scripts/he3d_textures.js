@@ -24,7 +24,7 @@ he3d.t.blankImage=function(format,stype,width,height,color){
 			if(stype==he3d.gl.FLOAT)
 				var image=new Float32Array((height*width)*3);	// XXX doesn't work?
 			else
-				var image=new Uint8Array((height*width)*3);	
+				var image=new Uint8Array((height*width)*3);
 			for(var w=0;w<width;w++){
 				for(var h=0;h<height;h++){
 					image[i++]=color[0];
@@ -39,7 +39,7 @@ he3d.t.blankImage=function(format,stype,width,height,color){
 			if(stype==he3d.gl.FLOAT)
 				var image=new Float32Array((height*width)*3);	// XXX doesn't work?
 			else
-				var image=new Uint8Array((height*width)*4);	
+				var image=new Uint8Array((height*width)*4);
 			for(var w=0;w<width;w++){
 				for(var h=0;h<height;h++){
 					image[i++]=color[0];
@@ -77,7 +77,7 @@ he3d.t.load=function(texture){
 		if(texture.filter.mag!==undefined)
 			newtexture.filter.mag=texture.filter.mag;
 	}
-		
+
 	// Texture Format
 	switch(texture.format){
 		case 'alpha':
@@ -94,7 +94,7 @@ he3d.t.load=function(texture){
 			newtexture.format=he3d.gl.RGBA;
 			break;
 	}
-			
+
 	// New texture type
 	switch(newtexture.type){
 		case 'blank':
@@ -114,7 +114,7 @@ he3d.t.load=function(texture){
 
 			store=true;
 			break;
-			
+
 		case 'canvas':
 			newtexture.target=texture.target;
 			newtexture.image=newtexture.target.ctx.getImageData(0,0,texture.width,texture.height);
@@ -142,7 +142,7 @@ he3d.t.load=function(texture){
 			if(texture.name==undefined)
 				newtexture.name=texture.filename.substring(0,texture.filename.lastIndexOf('.'));
 			break;
-			
+
 		case 'image':
 			newtexture.image=new Image();
 			newtexture.image.onload=function(){he3d.t.store(newtexture.id);}
@@ -191,7 +191,7 @@ he3d.t.load=function(texture){
 		he3d.t.store(newtexture.id);
 	if(storeRawCubeMap)
 		he3d.t.storeRawCubeMap(newtexture.id);
-	
+
 	return newtexture.id;
 };
 
@@ -398,7 +398,7 @@ he3d.t.viewer.draw=function(){
 	he3d.r.changeProgram('postprocessing');
 
 	he3d.gl.enable(he3d.gl.BLEND);
-	
+
 	he3d.gl.uniform1i(he3d.r.curProgram.uniforms["texture"],he3d.t.viewer.id);
 	he3d.gl.uniform1f(he3d.r.curProgram.uniforms["vignette"],0.0);
 	he3d.gl.uniform1i(he3d.r.curProgram.uniforms["opt_fxaa"],0);
@@ -409,15 +409,10 @@ he3d.t.viewer.draw=function(){
 
 	// Object Data
 	he3d.gl.bindBuffer(he3d.gl.ARRAY_BUFFER,he3d.fx.postProcessing.vbo.buf_data);
-
-	he3d.gl.enableVertexAttribArray(he3d.r.curProgram.attributes['aPosition']);
 	he3d.gl.vertexAttribPointer(he3d.r.curProgram.attributes['aPosition'],
 		3,he3d.gl.FLOAT,false,48,0);
-
-	he3d.gl.enableVertexAttribArray(he3d.r.curProgram.attributes['aTexCoord']);
 	he3d.gl.vertexAttribPointer(he3d.r.curProgram.attributes['aTexCoord'],
 		2,he3d.gl.FLOAT,false,48,40);
-
 	he3d.gl.bindBuffer(he3d.gl.ELEMENT_ARRAY_BUFFER,he3d.fx.postProcessing.vbo.buf_indices);
 	he3d.gl.drawElements(he3d.fx.postProcessing.vbo.rendertype,
 		he3d.fx.postProcessing.vbo.indices,he3d.gl.UNSIGNED_SHORT,0);

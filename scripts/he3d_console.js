@@ -51,6 +51,17 @@ he3d.console.execute=function(){
 			else
 				he3d.log('NOTICE','Renderer.culling:',he3d.r.culling);
 			break;
+		case 'r_debugdrawcalls':
+			var t=null;
+			switch(parseInt(value[1])){
+				case 1:t=true;break;
+				case 0:t=false;break;
+			}
+			if(t!=null)
+				he3d.r.debugDrawCalls=t;
+			he3d.log('NOTICE','Renderer.debugDrawCalls:',
+				(he3d.r.debugDrawCalls?'Enabled':'Disabled'));
+			break;
 		case 'r_faviconfps':
 			var t=null;
 			switch(parseInt(value[1])){
@@ -78,7 +89,7 @@ he3d.console.execute=function(){
 				he3d.r.fps.show=parseInt(value[1]);
 			else
 				he3d.log('NOTICE','Renderer.fps.show:',he3d.r.fps.show);
-			
+
 			break;
 		case 'say':
 			if(value.length>1)
@@ -218,7 +229,7 @@ he3d.log=function(){
 	var level='notice';
 	var highlight='';
 	var msg='';
-			
+
 	switch(arguments.length){
 		case 3:
 			level=arguments[0];
@@ -247,7 +258,7 @@ he3d.log=function(){
 			break;
 		case 'error':
 			he3d.console.history.innerHTML+=
-				'<br><span class="error">ERROR:</span> '+highlight+msg;			
+				'<br><span class="error">ERROR:</span> '+highlight+msg;
 			break;
 		case 'warning':
 			he3d.console.history.innerHTML+=

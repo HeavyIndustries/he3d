@@ -37,7 +37,7 @@ he3d.s.load=function(newshader){
 			he3d.log('FATAL','Failed to retrieve Fragment Shader:',
 				newshader.name+" (Http Status: "+fxhr.status+")");
 			return;
-		}		
+		}
 		he3d.s.compileFragmentShader(newshader.name,fxhr.responseText);
 	},false);
 	fxhr.send();
@@ -59,7 +59,7 @@ he3d.s.load=function(newshader){
 			he3d.log('FATAL','Failed to retrieve Vertex Shader:',
 				newshader.name+" (Http Status: "+vxhr.status+")");
 			return;
-		}			
+		}
 		he3d.s.compileVertexShader(newshader.name,vxhr.responseText);
 	},false);
 	vxhr.send();
@@ -72,7 +72,7 @@ he3d.s.checkQueue=function(){
 			loaded++;
 			continue;
 		}
-		
+
 		if(he3d.s.shaders[s].frag==null||he3d.s.shaders[s].vertex==null)
 			continue;
 
@@ -93,7 +93,7 @@ he3d.s.checkQueue=function(){
 			};
 			he3d.log('NOTICE',"Shader Attributes ["+s+"]:",attribs.length);
 		}
-		
+
 		// Uniform Variable Bindings
 		newShader.uniforms=[];
 		if(he3d.s.shaders[s].fattribs||he3d.s.shaders[s].vattribs){
@@ -124,7 +124,7 @@ he3d.s.checkQueue=function(){
 		he3d.s.shaders[s].bound=false;
 		he3d.s.shaders[s].name=s;
 		he3d.s.shaders[s].id=sid;
-			
+
 		he3d.log('NOTICE',"Shader Program ["+s+"]:","Compiled");
 
 		loaded++;
@@ -147,7 +147,7 @@ he3d.s.compileFragmentShader=function(name,data){
 
 	he3d.s.shaders[name].fattribs=he3d.s.getVars('attribute',data);
 	he3d.s.shaders[name].funiforms=he3d.s.getVars('uniform',data);
-	
+
 	if (!he3d.gl.getShaderParameter(he3d.s.shaders[name].frag,
 		he3d.gl.COMPILE_STATUS)){
 		he3d.log('FATAL',"["+name+"] Fragment Compile Error:",
@@ -178,7 +178,7 @@ he3d.s.getVars=function(type,src){
 	var vars=[];
 	if(!type||!src)
 		return vars;
-		
+
 	switch(type){
 		case 'attribute':
 			var rgx=/attribute (.*?) (.*?);/gi;
@@ -190,7 +190,7 @@ he3d.s.getVars=function(type,src){
 			dlog("Warning: unknown shader variable type - "+type);
 			return vars;
 			break;
-	} 
+	}
 	var matches=src.match(rgx);
 	for(var m in matches){
 		var v=matches[m].split(" ");

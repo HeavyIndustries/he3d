@@ -3,7 +3,7 @@
 //
 he3d.noGame={};
 he3d.noGame.load=function(){
-	he3d.game.vbo=he3d.primatives.quad();
+	he3d.game.vbo=he3d.primatives.quad('vt');
 	he3d.game.angle=0;
 	he3d.s.path='../he3d/shaders/';
 	he3d.s.load({name: 'nogame'});
@@ -56,19 +56,15 @@ he3d.noGame.draw=function(){
 	// Object Data
 	he3d.gl.bindBuffer(he3d.gl.ARRAY_BUFFER,he3d.game.vbo.buf_data);
 
-	he3d.gl.uniform1f(he3d.r.curProgram.uniforms['angle'],he3d.game.angle);
-	he3d.gl.uniform1i(he3d.r.curProgram.uniforms['texture'],he3d.game.vbo.texture);
-	he3d.gl.uniformMatrix4fv(he3d.r.curProgram.uniforms['uPMatrix'],false,he3d.game.view);
-	he3d.gl.uniform2fv(he3d.r.curProgram.uniforms['uSize'],
-		[he3d.canvas.width,he3d.canvas.height]);
+	he3d.gl.uniform1f(he3d.r.curProgram.uniforms.angle,he3d.game.angle);
+	he3d.gl.uniform1i(he3d.r.curProgram.uniforms.texture,he3d.game.vbo.texture);
+	he3d.gl.uniformMatrix4fv(he3d.r.curProgram.uniforms.uPMatrix,false,he3d.game.view);
+	he3d.gl.uniform2fv(he3d.r.curProgram.uniforms.uSize,[he3d.canvas.width,he3d.canvas.height]);
 
-	he3d.gl.enableVertexAttribArray(he3d.r.curProgram.attributes['aPosition']);
-	he3d.gl.vertexAttribPointer(he3d.r.curProgram.attributes['aPosition'],
-		3,he3d.gl.FLOAT,false,48,0);
-
-	he3d.gl.enableVertexAttribArray(he3d.r.curProgram.attributes['aTexCoord']);
-	he3d.gl.vertexAttribPointer(he3d.r.curProgram.attributes['aTexCoord'],
-		2,he3d.gl.FLOAT,false,48,40);
+	he3d.gl.vertexAttribPointer(he3d.r.curProgram.attributes.aPosition,he3d.game.vbo.buf_sizes.v,
+		he3d.gl.FLOAT,false,he3d.game.vbo.buf_size,he3d.game.vbo.buf_offsets.v);
+	he3d.gl.vertexAttribPointer(he3d.r.curProgram.attributes.aTexCoord,he3d.game.vbo.buf_sizes.t,
+		he3d.gl.FLOAT,false,he3d.game.vbo.buf_size,he3d.game.vbo.buf_offsets.t);
 
 	he3d.gl.bindBuffer(he3d.gl.ELEMENT_ARRAY_BUFFER,he3d.game.vbo.buf_indices);
 	he3d.gl.drawElements(he3d.game.vbo.rendertype,

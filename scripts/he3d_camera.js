@@ -9,7 +9,7 @@ he3d.camera=function(s){
 	this.type='world';
 
 	this.fov=45.0;
-	this.near=0.1;
+	this.near=1.0;
 	this.far=200.0;
 
 	this.distance=0;
@@ -17,6 +17,8 @@ he3d.camera=function(s){
 	this.accel=5.0;
 	this.k_turnspeed=90.0;
 	this.m_turnspeed=45.0;
+
+	this.mlook=true;
 
 	// Overload settings
 	for(var a in s){this[a]=s[a];}
@@ -33,21 +35,21 @@ he3d.camera.prototype.init=function(){
 
 he3d.camera.prototype.lookAt=function(dest){
 	var upx=0,upy=1,upz=0;
-	
+
 	if(this.pos[0]==dest[0]&&this.pos[1]==dest[1]&&this.pos[2]==dest[2])
 		return he3d.m.mat4.identity(he3d.r.pMatrix);
-	
+
 	var z0,z1,z2,x0,x1,x2,y0,y1,y2,len;
-	
+
 	z0=this.pos[0]-dest[0];
 	z1=this.pos[1]-dest[1];
 	z2=this.pos[2]-dest[2];
-	
+
 	len=1/Math.sqrt(z0*z0+z1*z1+z2*z2);
 	z0*=len;
 	z1*=len;
 	z2*=len;
-	
+
 	x0=upy*z2-upz*z1;
 	x1=upz*z0-upx*z2;
 	x2=upx*z1-upy*z0;
@@ -62,11 +64,11 @@ he3d.camera.prototype.lookAt=function(dest){
 		x1*=len;
 		x2*=len;
 	}
-	
+
 	y0=z1*x2-z2*x1;
 	y1=z2*x0-z0*x2;
 	y2=z0*x1-z1*x0;
-	
+
 	len=Math.sqrt(y0*y0+y1*y1+y2*y2);
 	if(!len){
 		y0=0;
@@ -78,7 +80,7 @@ he3d.camera.prototype.lookAt=function(dest){
 		y1*=len;
 		y2*=len;
 	}
-	
+
 	he3d.r.mvMatrix[0]=x0;
 	he3d.r.mvMatrix[1]=y0;
 	he3d.r.mvMatrix[2]=z0;
@@ -103,14 +105,14 @@ he3d.camera.prototype.readInput=function(){
 	this.mod=1;
 	if(he3d.i.keys[he3d.e.keys.SHIFT])
 		this.mod=2.5;
-	
+
 	if(he3d.i.keys[he3d.e.keys.W])this.delta[2]= (this.accel/this.mod)*he3d.timer.delta;
 	if(he3d.i.keys[he3d.e.keys.S])this.delta[2]=-(this.accel/this.mod)*he3d.timer.delta;
 	if(he3d.i.keys[he3d.e.keys.A])this.delta[0]= (this.accel/this.mod)*he3d.timer.delta;
 	if(he3d.i.keys[he3d.e.keys.D])this.delta[0]=-(this.accel/this.mod)*he3d.timer.delta;
 	if(he3d.i.keys[he3d.e.keys.E])this.delta[1]= (this.accel/this.mod)*he3d.timer.delta;
 	if(he3d.i.keys[he3d.e.keys.Q])this.delta[1]=-(this.accel/this.mod)*he3d.timer.delta;
-	
+
 	if(he3d.i.keys[he3d.e.keys.LEFT_ARROW])this.angle[1]+=
 		(this.k_turnspeed/this.mod)*he3d.timer.delta;
 	if(he3d.i.keys[he3d.e.keys.RIGHT_ARROW])this.angle[1]-=
@@ -121,7 +123,7 @@ he3d.camera.prototype.readInput=function(){
 		(this.k_turnspeed/this.mod)*he3d.timer.delta;
 
 	// Middle Mouse Button Camera Rotation
-	if(he3d.i.pointerLocked||he3d.i.mouse.buttons[he3d.e.mouse.middle]){
+	if((he3d.i.pointerLocked&&this.mlook)||he3d.i.mouse.buttons[he3d.e.mouse.middle]){
 		this.angle[1]-=(this.m_turnspeed*he3d.i.mouse.delta[0])*he3d.timer.delta;
 		this.angle[0]-=(this.m_turnspeed*he3d.i.mouse.delta[1])*he3d.timer.delta;
 	}
@@ -161,7 +163,7 @@ he3d.camera.prototype.update=function(){
 		this.qrot=he3d.m.quat4.eulerAngleCreate(this.angle[0],this.angle[1],0);
 		he3d.m.quat4.multiplyVec3(this.qrot,this.delta);
 		this.camMat=he3d.m.quat4.toMat4_broke(this.qrot);
-	
+
 		// Movement
 		this.pos[0]+=this.delta[0];
 		this.pos[1]+=this.delta[1];
@@ -206,7 +208,7 @@ he3d.camera.prototype.view=function(){
 		this.rotx=this.angle[0]-90; // 0 degrees is Up!
 		if(this.rotx>360)this.rotx-=360;
 		else if(this.rotx<0)this.rotx+=360;
-			
+
 		he3d.m.mat4.identity(he3d.r.mvMatrix);
 		he3d.m.mat4.rotateX(he3d.r.mvMatrix,he3d.m.degtorad(this.rotx));
 		he3d.m.mat4.rotateY(he3d.r.mvMatrix,he3d.m.degtorad(this.angle[1]));

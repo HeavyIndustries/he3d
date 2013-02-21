@@ -13,13 +13,12 @@ he3d.modelLoader.load=function(newmodel){
 
 	he3d.log('NOTICE','Requesting Model File:',file);
 	newmodel.loaded=false;
-	if(!newmodel.bbtype)
-		newmodel.bbtype='none';
-	if(!newmodel.diFormat)
-		newmodel.diFormat='detect';
-	if(!newmodel.scale)
-		newmodel.scale=[1.0,1.0,1.0];
-		
+	if(!newmodel.bbtype)	newmodel.bbtype='none';
+	if(!newmodel.diFormat)	newmodel.diFormat='detect';
+	if(!newmodel.rotate)	newmodel.rotate=[0.0,0.0,0.0,0.0];
+	if(!newmodel.scale)		newmodel.scale=[1.0,1.0,1.0];
+	if(!newmodel.translate)	newmodel.translate=[0.0,0.0,0.0];
+
 	// Load models's in worker thread
 	var ext=fileType[fileType.length-1].toLowerCase();
 	switch(ext){
@@ -33,12 +32,14 @@ he3d.modelLoader.load=function(newmodel){
 			};
 			wwml.model=newmodel;
 			wwml.postMessage({
-				'debug':he3d.modelLoader.debug,
-				'path':he3d.game.path+he3d.modelLoader.path,
-				'filename':newmodel.filename,
-				'bbtype':newmodel.bbtype,
-				'diFormat':newmodel.diFormat,
-				'scale':newmodel.scale
+				'debug':	he3d.modelLoader.debug,
+				'path':		he3d.game.path+he3d.modelLoader.path,
+				'filename':	newmodel.filename,
+				'bbtype':	newmodel.bbtype,
+				'diFormat':	newmodel.diFormat,
+				'rotate':	newmodel.rotate,
+				'translate':newmodel.translate,
+				'scale':	newmodel.scale
 			});
 			break;
 
@@ -95,6 +96,9 @@ he3d.modelLoader.progress=function(e){
 		});
 	}
 
+	if(e.data.verts)
+		this.model.verts=e.data.verts;
+
 	// Animation framed models
 	if(e.data.animations){
 		for(var a=0;a<e.data.animations.length;a++){
@@ -134,7 +138,7 @@ he3d.modelLoader.progress=function(e){
 	he3d.gl.bindBuffer(he3d.gl.ELEMENT_ARRAY_BUFFER,this.model.buf_indices);
 	he3d.gl.bufferData(he3d.gl.ELEMENT_ARRAY_BUFFER,
 		new Uint16Array(e.data.indices),he3d.gl.STATIC_DRAW);
-			
+
 	if(e.data.bbox){
 		this.model.bbox=e.data.bbox;
 		if(e.data.bbox.type){
@@ -154,12 +158,13 @@ he3d.modelLoader.progress=function(e){
 		}
 	}
 	this.model.diFormat='vnct';
-	if(e.data.diFormat)
-		this.model.diFormat=e.data.diFormat;
+	if(e.data.diFormat)this.model.diFormat=e.data.diFormat;
+	if(e.data.buf_offsets)this.model.buf_offsets=e.data.buf_offsets;
+	if(e.data.buf_sizes)this.model.buf_sizes=e.data.buf_sizes;
+	if(e.data.buf_size)this.model.buf_size=e.data.buf_size;
+	if(e.data.indices_raw)this.model.indices_raw=e.data.indices_raw;
+	if(e.data.tags)this.model.tags=e.data.tags;
 
-	if(e.data.tags)
-		this.model.tags=e.data.tags;
-	
 	this.model.loaded=true;
 };
 
@@ -208,7 +213,7 @@ he3d.modelLoader.compileXMLModel=function(model,xml){
 	for(var v=0;v<tverts;v+=3)
 		if(verts[v-1]>height)
 			height=verts[v-1];
-	
+
 	if(normals.length>1)
 		normals=normals.split(',');
 	else
@@ -221,7 +226,7 @@ he3d.modelLoader.compileXMLModel=function(model,xml){
 		for(var v=0;v<tverts;v++)
 			colors.push(1.0,0.0,1.0,1.0);
 	}
-	
+
 	if(texcoords.length>1){
 		texcoords=texcoords.split(',');
 	} else {
@@ -237,7 +242,7 @@ he3d.modelLoader.compileXMLModel=function(model,xml){
 			);
 		}
 	}
-		
+
 	indices=indices.split(',');
 
 	var data=he3d.tools.interleaveFloat32Arrays([3,3,4,2],[verts,normals,colors,texcoords]);
@@ -261,14 +266,14 @@ he3d.modelLoader.compileXMLModel=function(model,xml){
 		he3d.log("DEBUG","Model Height:",height);
 		he3d.log("DEBUG","Model Created",model.filename);
 	}
-	
+
 	model.loaded=true;
 };
 
 he3d.modelLoader.getXMLNode=function(data,node){
 	if(data.getElementsByTagName(node)[0]==undefined)
 		return '';
-		
+
 	return data.getElementsByTagName(node)[0].childNodes[0].nodeValue
 		.replace(/\t/g,'').replace(/\s/g,'');
 };

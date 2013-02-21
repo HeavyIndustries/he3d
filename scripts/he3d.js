@@ -87,10 +87,12 @@ var he3d={
 		};
 		head.appendChild(script);
 	};
-	
+
 	he3d.init=function(){
-		if(navigator.userAgent.indexOf('Fennec')>1)
+		if(navigator.userAgent.indexOf('Fennec')>1||navigator.userAgent.indexOf('Mobile Safari')>1){
 			he3d.platform='mobile';
+			he3d.log('NOTICE','Mobile Platform detected');
+		}
 
 		he3d.console.initBindings();
 		he3d.r.init();
@@ -99,7 +101,7 @@ var he3d={
 		he3d.i.initInputManager();
 		he3d.r.fps.favicon.init();
 		he3d.a.init();
-		
+
 		if(!he3d.running)return;
 		if(he3d.game!=undefined){
 			he3d.log('NOTICE','Loading Game:',he3d.game.name);
@@ -174,7 +176,7 @@ var he3d={
 		he3d.timer.accum+=he3d.timer.wallDelta;
 		he3d.timer.delta=0.016;
 		if(he3d.timer.accum>he3d.timer.delta){
-			he3d.timer.delta=he3d.timer.accum;		
+			he3d.timer.delta=he3d.timer.accum;
 			he3d.timer.accum=0;
 		} else {
 			he3d.timer.delta=0;

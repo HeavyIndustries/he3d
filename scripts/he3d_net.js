@@ -19,9 +19,9 @@ he3d.net.connect=function(server){
 
 	if(server.addr)he3d.net.addr=server.addr;
 	if(server.port&&!isNaN(server.port))he3d.net.port=server.port;
-		
+
 	try{
-		he3d.net.ws=io.connect("http://"+he3d.net.addr+":"+he3d.net.port);		
+		he3d.net.ws=io.connect("http://"+he3d.net.addr+":"+he3d.net.port);
 		he3d.log("NET","Connecting to server:",he3d.net.addr+":"+he3d.net.port);
 		he3d.net.ws.on('connect',function(){
 			he3d.net.connected=true;

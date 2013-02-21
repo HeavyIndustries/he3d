@@ -37,7 +37,7 @@ onmessage=function(e) {
 	he3d.modelLoader.debug=e.data.debug;
 	e.data.frames=[];
 	e.data.frameCount=0;
-	
+
 	// Multiple File Model
 	if(e.data.filename.indexOf(',')>0){
 		var files=e.data.filename.split(',');
@@ -64,7 +64,7 @@ he3d.modelLoader.getFile=function(e){
 	var fileType=file.split('.');
 	if(fileType[fileType.length-1].toLowerCase()=='md2')	// Binary File Type
 		mxhr.responseType="arraybuffer";
-		
+
 	mxhr.addEventListener('error',function(){
 		he3d.log('FATAL','Failed to retrieve Model:',file);
 	},false);
@@ -73,6 +73,12 @@ he3d.modelLoader.getFile=function(e){
 			he3d.log('FATAL','Failed to retrieve Model:',file+" (Http Status: "+mxhr.status+")");
 			return;
 		}
+		// Build RST Matrix
+		var srt=he3d.m.mat4.identity();
+		he3d.m.mat4.scale(srt,e.data.scale);
+		he3d.m.mat4.rotate(srt,e.data.rotate[3],e.data.rotate);
+		he3d.m.mat4.translate(srt,e.data.translate);
+	
 		var fileType=file.split('.');
 		switch(fileType[fileType.length-1].toLowerCase()){
 			case 'md2':
@@ -91,7 +97,7 @@ he3d.modelLoader.getFile=function(e){
 				},false);
 				mtlxhr.addEventListener('load',function(){
 					he3d.modelLoader.obj.compile(filename,obj,
-						mtlxhr.responseText,e.data.bbtype,e.data.diFormat,
+						mtlxhr.responseText,e.data.bbtype,e.data.diFormat,srt,
 						e.data.frameCount,e.data.frames);
 				});
 				mtlxhr.send();
@@ -237,7 +243,7 @@ he3d.modelLoader.md2.compile=function(filename,data,bbt,diFormat,scale){
 		scale=[1.0,1.0,1.0];
 	else if(typeof(scale)!='array'&&!isNaN(scale))
 		scale=[scale,scale,scale];
-	
+
 	he3d.modelLoader.md2.getHeader(md2,view);
 	he3d.modelLoader.md2.getTextures(md2,view);
 	he3d.modelLoader.md2.getTextureCoords(md2,view);
@@ -272,7 +278,7 @@ he3d.modelLoader.md2.compile=function(filename,data,bbt,diFormat,scale){
 			if(nfname[0]!=fname)
 				nframe=fstart;
 		}
-			
+
 		for(var f=0;f<md2.header.nfaces;f++){
 			for(var v=0;v<3;v++){
 				verts.push(
@@ -305,7 +311,7 @@ he3d.modelLoader.md2.compile=function(filename,data,bbt,diFormat,scale){
 		he3d.log("DEBUG","Model Frames:",frames.length);
 		he3d.log("DEBUG","Model Created",filename);
 	}
-	
+
 	postMessage({
 		'animations':animations,
 		'diFormat':diFormat,
@@ -343,7 +349,7 @@ he3d.modelLoader.obj.getRawData=function(obj,objfile){
 					ti:[parseInt(i1[1])-1,parseInt(i2[1])-1,parseInt(i3[1])-1],
 					ni:[parseInt(i1[2])-1,parseInt(i2[2])-1,parseInt(i3[2])-1]
 				});
-				break;			
+				break;
 			case 'usemtl':
 				mat=lines[l].replace('usemtl ','').replace(/\r/g,'');
 				break;
@@ -402,7 +408,8 @@ he3d.modelLoader.obj.getEfx=function(obj){
 		}
 	}
 };
-he3d.modelLoader.obj.compile=function(filename,objfile,mtlfile,bbt,diFormat,frameCount,frames){
+he3d.modelLoader.obj.compile=function(filename,objfile,mtlfile,bbt,diFormat,srt,frameCount,frames){
+
 	// Validate file
 	if(!objfile){
 		he3d.log('FATAL','Invalid Model File: '+filename,'No data found');
@@ -418,7 +425,7 @@ he3d.modelLoader.obj.compile=function(filename,objfile,mtlfile,bbt,diFormat,fram
 	he3d.modelLoader.obj.getMaterials(obj,mtlfile);
 	he3d.modelLoader.obj.getTags(obj);
 	he3d.modelLoader.obj.getEfx(obj);
-
+	
 	// Convert duplicate verts, 1 color/vert
 	var verts=[];
 	var normals=[];
@@ -477,8 +484,14 @@ he3d.modelLoader.obj.compile=function(filename,objfile,mtlfile,bbt,diFormat,fram
 				effect=obj.efx[e].eid;
 		}
 
+		var vert;
 		for(var idx=0;idx<obj.indices[i].vi.length;idx++){
-			var vert=obj.verts[obj.indices[i].vi[idx]].split(" ");
+			if(!obj.verts[obj.indices[i].vi[idx]]){
+				he3d.log("WARNING","Invalid Vertex Index",obj.indices[i].vi[idx]);
+				continue;
+			}
+			vert=obj.verts[obj.indices[i].vi[idx]].split(" ");
+			he3d.m.mat4.multiplyVec3(srt,vert);
 			verts.push(parseFloat(vert[0]),parseFloat(vert[1]),parseFloat(vert[2]));
 
 			// Bounding Box
@@ -532,19 +545,12 @@ he3d.modelLoader.obj.compile=function(filename,objfile,mtlfile,bbt,diFormat,fram
 	var data;
 	if(diFormat.toLowerCase()=='detect'&&obj.efx.length)
 		diFormat='vncte';
-	
-	switch(diFormat.toLowerCase()){
-		default:
-		case 'vnct':
-			data=he3d.tools.interleaveFloat32Arrays(
-				[3,3,4,2],[verts,normals,colors,texcoords]);
-			break;
-		case 'vncte':
-			data=he3d.tools.interleaveFloat32Arrays(
-				[3,3,4,2,1],[verts,normals,colors,texcoords,effects]);
-			break;
-		case 'interleaveframes':
-			var frame={
+	else if(diFormat.toLowerCase()=='detect')
+		diFormat='vnct';
+
+	// Multi-Frame Model
+	if(diFormat.toLowerCase()=='interleaveframes'){
+		var frame={
 				filename:filename,
 				indices:indices,
 				verts:verts,
@@ -558,8 +564,30 @@ he3d.modelLoader.obj.compile=function(filename,objfile,mtlfile,bbt,diFormat,fram
 			var fc=frames.push(frame);
 			if(fc==frameCount)
 				he3d.modelLoader.obj.compileAnimation(frames);
-			return
-			break;
+			return;
+
+	// Standard Model
+	}else{
+		var diType=diFormat.split('');
+		var diTypes=[],diDSizes=[],diSizes=[],diOffsets=[],curOff=0;
+		for(var dit in diType){
+			switch(diType[dit]){
+				case 'v':diTypes.push(verts);diDSizes.push(3);diSizes[diType[dit]]=3;break;
+				case 'n':diTypes.push(normals);diDSizes.push(3);diSizes[diType[dit]]=3;break;
+				case 'c':diTypes.push(colors);diDSizes.push(4);diSizes[diType[dit]]=4;break;
+				case 't':diTypes.push(texcoords);diDSizes.push(2);diSizes[diType[dit]]=2;break;
+				case 'b':diTypes.push(barys);diDSizes.push(3);diSizes[diType[dit]]=3;break;
+				case 'e':diTypes.push(effects);diDSizes.push(1);diSizes[diType[dit]]=1;break;
+				case 't':diTypes.push(tags);diDSizes.push(1);diSizes[diType[dit]]=1;break;
+				default:he3d.log("WARNING","Unknown DataInterleave Type",diType[dit]);continue;break;
+			};
+			diOffsets[diType[dit]]=curOff;
+			curOff+=(diDSizes[diDSizes.length-1]*Float32Array.BYTES_PER_ELEMENT);
+		}
+		var data=he3d.tools.interleaveFloat32Arrays(diDSizes,diTypes);
+		var buf_offsets=diOffsets;
+		var buf_sizes=diSizes;
+		var buf_size=diDSizes.reduce(function(a,b){return a+b;})*Float32Array.BYTES_PER_ELEMENT;
 	}
 
 	if(he3d.modelLoader.debug){
@@ -568,18 +596,24 @@ he3d.modelLoader.obj.compile=function(filename,objfile,mtlfile,bbt,diFormat,fram
 		he3d.log("DEBUG","Model Colors:",colors.length/4);
 		he3d.log("DEBUG","Model TexCoords:",texcoords.length/2);
 		he3d.log("DEBUG","Model Triangles:",indices.length/3);
+		he3d.log("DEBUG","Model Indices:",indices.length);
 		he3d.log("DEBUG","Model Tags:",""+obj.tags.length);
 		he3d.log("DEBUG","Tags Detected:",JSON.stringify(obj.tags));
 		he3d.log("DEBUG","Model BBox:",JSON.stringify(bbox));
 		he3d.log("DEBUG","Model Created",filename);
 	}
-	
+
 	postMessage({
-		'data':data,
-		'diFormat':diFormat,
-		'indices':new Uint16Array(indices),
-		'bbox':bbox,
-		'tags':obj.tags
+		'bbox':			bbox,
+		'buf_offsets':	buf_offsets,
+		'buf_sizes':	buf_sizes,
+		'buf_size':		buf_size,
+		'data':			data,
+		'diFormat':		diFormat,
+		'indices':		new Uint16Array(indices),
+		'indices_raw':	indices,
+		'tags':			obj.tags,
+		'verts':		verts
 	});
 };
 
@@ -593,7 +627,7 @@ he3d.modelLoader.obj.compileAnimation=function(frames){
 		if(f1>f2)return 1;
 		return 0;
 	});
-	
+
 	for(var frame=0;frame<frames.length;frame++){
 		var nframe=frame+1;
 		if(nframe>=frames.length)
@@ -605,7 +639,7 @@ he3d.modelLoader.obj.compileAnimation=function(frames){
 	}
 	he3d.log("NOTICE","Animated OBJ ("+frames[0].filename+
 		") Loaded","Frame Count: "+frames.length);
-	
+
 	postMessage({
 		'frames':data,
 		'diFormat':'vvnct',

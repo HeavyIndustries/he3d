@@ -34,7 +34,7 @@ he3d.ps.add=function(opts){
 		he3d.log('WARNING','Maximum Particles Exceeded:',he3d.ps.max_particles);
 		return;
 	}
-	
+
 	if(!opts)opts={};
 	var p={
 		amount:1,
@@ -105,8 +105,7 @@ he3d.ps.add=function(opts){
 he3d.ps.draw=function(){
 	if(!he3d.ps.total)return;
 
-	if(!he3d.fx.shadowMapping.pass)
-		he3d.r.changeProgram(he3d.ps.vbo.shader);
+	he3d.r.changeProgram(he3d.ps.vbo.shader);
 
 	// Blending
 	he3d.gl.enable(he3d.gl.BLEND);
@@ -115,30 +114,18 @@ he3d.ps.draw=function(){
 	he3d.gl.bindBuffer(he3d.gl.ARRAY_BUFFER,he3d.ps.vbo.buf_data);
 	he3d.gl.bufferData(he3d.gl.ARRAY_BUFFER,he3d.ps.vbo.data,he3d.gl.DYNAMIC_DRAW);
 
-	he3d.gl.enableVertexAttribArray(he3d.r.curProgram.attributes['aPosition']);
 	he3d.gl.vertexAttribPointer(he3d.r.curProgram.attributes['aPosition'],
 		3,he3d.gl.FLOAT,false,36,0);
-
-	if(!he3d.fx.shadowMapping.pass){
-		he3d.gl.enableVertexAttribArray(he3d.r.curProgram.attributes['aColor']);
-		he3d.gl.vertexAttribPointer(he3d.r.curProgram.attributes['aColor'],
-			4,he3d.gl.FLOAT,false,36,12);
-
-		he3d.gl.enableVertexAttribArray(he3d.r.curProgram.attributes['aSize']);
-		he3d.gl.vertexAttribPointer(he3d.r.curProgram.attributes['aSize'],
-			1,he3d.gl.FLOAT,false,36,28);
-		
-		he3d.gl.enableVertexAttribArray(he3d.r.curProgram.attributes['aType']);
-		he3d.gl.vertexAttribPointer(he3d.r.curProgram.attributes['aType'],
-			1,he3d.gl.FLOAT,false,36,32);
-	} else {
-		he3d.gl.uniform1f(he3d.r.curProgram.uniforms['uType'],2.0);
-	}
+	he3d.gl.vertexAttribPointer(he3d.r.curProgram.attributes['aColor'],
+		4,he3d.gl.FLOAT,false,36,12);
+	he3d.gl.vertexAttribPointer(he3d.r.curProgram.attributes['aSize'],
+		1,he3d.gl.FLOAT,false,36,28);
+	he3d.gl.vertexAttribPointer(he3d.r.curProgram.attributes['aType'],
+		1,he3d.gl.FLOAT,false,36,32);
 
 	// Shader Options
 	he3d.gl.uniform1i(he3d.r.curProgram.uniforms['uShadowPass'],he3d.fx.shadowMapping.pass);
 	he3d.gl.uniform1i(he3d.r.curProgram.uniforms['uBlurPass'],he3d.fx.blur.pass);
-	he3d.gl.uniform1i(he3d.r.curProgram.uniforms['uBlur'],he3d.fx.blur.doBlur);
 
 	if(he3d.ps.drawcb)
 		he3d.ps.drawcb();

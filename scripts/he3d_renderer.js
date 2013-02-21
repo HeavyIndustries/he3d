@@ -7,6 +7,7 @@ he3d.r={
 	culling:true,
 	curProgram:null,
 	debugCtx:false,
+	debugDrawCalls:false,
 	fps:{
 		current:1,
 		count:0,
@@ -50,6 +51,10 @@ he3d.r={
 //
 he3d.r.init=function(){
 	he3d.canvas=document.getElementById('he3d');
+
+	if(he3d.platform=='mobile')
+		he3d.r.glOpts.antialias=false;
+	
 	try{
 		if(he3d.r.debugCtx){
 			he3d.gl=WebGLDebugUtils.makeDebugContext(he3d.canvas.getContext(
@@ -58,7 +63,7 @@ he3d.r.init=function(){
 		}else{
 			he3d.gl=he3d.canvas.getContext("experimental-webgl",he3d.r.glOpts);
 		}
-		
+
 		he3d.gl.viewportHeight=he3d.canvas.height;
 		he3d.gl.viewportWidth=he3d.canvas.width;
 	}catch(e){
@@ -87,8 +92,10 @@ he3d.r.init=function(){
 		return false;
 	}
 
-	if(he3d.platform=='mobile')
+	if(he3d.platform=='mobile'){
 		he3d.r.fullscreen=true;
+		he3d.fx.postProcessing.options.fxaa=false;
+	}
 
 	he3d.r.listCaps();
 	he3d.r.initViewMatrices();
@@ -140,7 +147,7 @@ he3d.r.listCaps=function(){
 
 	if(he3d.t.af.ext)
 		he3d.log('NOTICE',"GL Max Texture Anisotropy:",he3d.t.af.max);
-		
+
 	he3d.log('NOTICE',"GL Context:",he3d.gl.viewportWidth+"x"+he3d.gl.viewportHeight);
 
 	he3d.r.glAttribs=he3d.gl.getContextAttributes();
@@ -161,7 +168,7 @@ he3d.r.listCaps=function(){
 
 	he3d.gl.clearDepth(1.0);
 	he3d.log('NOTICE',"GL DEPTH BUFFER:",he3d.gl.getParameter(he3d.gl.DEPTH_BITS)+"bit");
-	
+
 	he3d.gl.enable(he3d.gl.DEPTH_TEST);
 	he3d.gl.depthFunc(he3d.gl.LEQUAL);
 	he3d.log('NOTICE',"GL DEPTH_TEST:","LEQUAL");
@@ -194,6 +201,13 @@ he3d.r.getGLExt=function(ext){
 	return null;
 };
 
+he3d.r.getGLErrorString=function(err){
+	for(var prop in he3d.gl)
+		if(he3d.gl[prop]==err)
+			return prop;
+	return 'Invalid Enum :'+err;
+};
+
 he3d.r.throwOnGLError=function(err,funcName,args){
 	var error=WebGLDebugUtils.glEnumToString(err)+" was caused by call to "
 		+funcName+"("+JSON.stringify(args)+")";
@@ -210,16 +224,30 @@ he3d.r.throwOnGLError=function(err,funcName,args){
 he3d.r.changeProgram=function(prog){
 	if(he3d.r.curProgram==null||prog!=he3d.r.curProgram.name){
 		// Disable Active Attrs
-		if(he3d.r.curProgram!=null)
-			for(var a in he3d.r.curProgram.attributes)
+		if(he3d.r.curProgram!=null){
+			for(var a in he3d.r.curProgram.attributes){
+				if(he3d.r.curProgram.attributes[a]==-1)
+					continue;
 				he3d.gl.disableVertexAttribArray(he3d.r.curProgram.attributes[a]);
+			}
+			he3d.r.curProgram.bound=false;
+		}
 
 		he3d.r.curProgram=he3d.s.shaders[prog];
 		he3d.gl.useProgram(he3d.r.curProgram);
-		
+
+		// Enable Active Attrs
+		for(var a in he3d.r.curProgram.attributes){
+			if(he3d.r.curProgram.attributes[a]==-1)
+				continue;
+			he3d.gl.enableVertexAttribArray(he3d.r.curProgram.attributes[a]);
+		}
+
 		if((he3d.r.forceRebind||!he3d.r.curProgram.bound)&&he3d.r.curProgram.bind!=null)
 			he3d.r.curProgram.bind();
+		return true;
 	}
+	return false;
 };
 
 //
@@ -246,7 +274,7 @@ he3d.r.drawFrame=function(){
 	}
 
 	he3d.fx.postProcessing.draw();
-		
+
 	he3d.hud.update();
 	if(he3d.hud.mode=='3d')
 		he3d.hud.draw();
@@ -272,10 +300,10 @@ he3d.r.fps.favicon.init=function(){
 	if(!this.enabled)
 		return;
 	this.canvas=document.createElement('canvas');
-	this.canvas.setAttribute('width',this.size[0]);  
+	this.canvas.setAttribute('width',this.size[0]);
 	this.canvas.setAttribute('height',this.size[1]);
 	this.canvas.setAttribute('id','fpsfavicon');
-	
+
 	this.ctx=this.canvas.getContext('2d');
 	this.ctx.setTransform(1,0,0,1,0,0);
 	this.ctx.clearRect(0,0,this.size[0],this.size[1]);
@@ -297,7 +325,7 @@ he3d.r.fps.favicon.toggle=function(t){
 		this.target.setAttribute('type','image/png');
 		this.target.setAttribute('href','favicon.png');
 		head.appendChild(this.target);
-	}		
+	}
 };
 
 he3d.r.fps.favicon.update=function(){
@@ -313,7 +341,7 @@ he3d.r.fps.favicon.update=function(){
 		this.ctx.fillStyle="#F00";
 	this.ctx.fillText('FPS',2,7);
 	this.ctx.fillText(he3d.r.fps.count,4,15);
-	
+
 	var head=this.target.parentNode;
 	head.removeChild(this.target);
 	this.target=document.createElement("link");
@@ -329,12 +357,8 @@ he3d.r.fps.favicon.update=function(){
 he3d.r.initViewMatrices=function(){
 	he3d.r.pMatrix=he3d.m.mat4.create();
 	he3d.log('NOTICE','Matrix Create:','Perspective');
-
 	he3d.r.mvMatrix=he3d.m.mat4.create();
 	he3d.log('NOTICE','Matrix Create:','Model View');
-	
-	he3d.r.worldPosMatrix=he3d.m.mat4.identity(he3d.m.mat4.create());
-	he3d.log('NOTICE','Matrix Create:','World Pos');
 };
 
 he3d.r.mvPushMatrix=function(){
@@ -426,7 +450,7 @@ he3d.r.setCulling=function(c){
 	if(c==undefined)
 		c=!he3d.r.culling;
 	he3d.r.culling=c;
-	
+
 	if(he3d.r.culling){
 		he3d.gl.enable(he3d.gl.CULL_FACE);
 		he3d.gl.cullFace(he3d.gl.BACK);

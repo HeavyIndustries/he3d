@@ -53,13 +53,13 @@ he3d.tools.createNormalsFromVerts=function(verts){
 			verts[v+7],
 			verts[v+8]
 		],vert3);
-			
+
 		he3d.m.vec3.subtract(vert2,vert1,v1);
 		he3d.m.vec3.subtract(vert3,vert1,v2);
-			
+
 		he3d.m.vec3.cross(v1,v2,vc);
 		he3d.m.vec3.normalize(vc);
-			
+
 		normals.push(
 			vc[0],vc[1],vc[2],
 			vc[0],vc[1],vc[2],
@@ -67,4 +67,119 @@ he3d.tools.createNormalsFromVerts=function(verts){
 		);
 	}
 	return normals;
+};
+
+//
+// Bounding Box ------------------------------------------------------------------------------------
+//
+he3d.tools.rebuildAABB=function(verts,bb,rotMat,rebuildVbo){
+	if(!this.vert)
+		this.vert=he3d.m.vec3.create([0,0,0]);
+
+	var x,y,z;
+
+	bb.x.min=Infinity;
+	bb.x.max=-Infinity;
+	bb.y.min=Infinity;
+	bb.y.max=-Infinity;
+	bb.z.min=Infinity;
+	bb.z.max=-Infinity;
+
+	for(var v=0;v<verts.length;v+=3){
+		x=verts[v];
+		y=verts[v+1];
+		z=verts[v+2];
+
+		this.vert[0]=rotMat[0]*x+rotMat[4]*y+rotMat[8]*z+rotMat[12];
+		this.vert[1]=rotMat[1]*x+rotMat[5]*y+rotMat[9]*z+rotMat[13];
+		this.vert[2]=rotMat[2]*x+rotMat[6]*y+rotMat[10]*z+rotMat[14];
+
+		if(parseFloat(this.vert[0])<parseFloat(bb.x.min))bb.x.min=parseFloat(this.vert[0]);
+		else if(parseFloat(this.vert[0])>parseFloat(bb.x.max))bb.x.max=parseFloat(this.vert[0]);
+		if(parseFloat(this.vert[1])<parseFloat(bb.y.min))bb.y.min=parseFloat(this.vert[1]);
+		else if(parseFloat(this.vert[1])>parseFloat(bb.y.max))bb.y.max=parseFloat(this.vert[1]);
+		if(parseFloat(this.vert[2])<parseFloat(bb.z.min))bb.z.min=parseFloat(this.vert[2]);
+		else if(parseFloat(this.vert[2])>parseFloat(bb.z.max))bb.z.max=parseFloat(this.vert[2]);
+	}
+
+	bb.width=Math.abs(bb.x.min-bb.x.max);
+	bb.height=Math.abs(bb.y.min-bb.y.max);
+	bb.depth=Math.abs(bb.z.min-bb.z.max);
+
+	if(rebuildVbo!=null)
+		rebuildVbo.bbox_vbo=he3d.primatives.bbox(bb);
+};
+
+he3d.tools.rebuildDOP18=function(pos,rotMat,verts,dop18){
+	if(!this.vert)
+		this.vert=he3d.m.vec3.create([0,0,0]);
+		
+	var val,x,y,z;
+	if(!dop18){
+		dop18={
+			min:new Float32Array(8),
+			max:new Float32Array(8)
+		};
+	}
+
+	for(var d=0;d<9;d++){
+		dop18.min[d]=Infinity;
+		dop18.max[d]=-Infinity;
+	}
+	
+	for(var v=0;v<verts.length;v+=3){
+		x=verts[v];
+		y=verts[v+1];
+		z=verts[v+2];
+
+		this.vert[0]=rotMat[0]*x+rotMat[4]*y+rotMat[8]*z+pos[0];
+		this.vert[1]=rotMat[1]*x+rotMat[5]*y+rotMat[9]*z+pos[1];
+		this.vert[2]=rotMat[2]*x+rotMat[6]*y+rotMat[10]*z+pos[2];
+
+		// X
+		val=this.vert[0];
+		if(val<dop18.min[0])dop18.min[0]=val;
+		if(val>dop18.max[0])dop18.max[0]=val;
+
+		// Y
+		val=this.vert[1];
+		if(val<dop18.min[1])dop18.min[1]=val;
+		if(val>dop18.max[1])dop18.max[1]=val;
+
+		// Z
+		val=this.vert[2];
+		if(val<dop18.min[2])dop18.min[2]=val;
+		if(val>dop18.max[2])dop18.max[2]=val;
+		
+		// X + Y
+		val=this.vert[0]+this.vert[1];
+		if(val<dop18.min[3])dop18.min[3]=val;
+		if(val>dop18.max[3])dop18.max[3]=val;
+
+		// X + Z
+ 		val=this.vert[0]+this.vert[2];
+		if(val<dop18.min[4])dop18.min[4]=val;
+		if(val>dop18.max[4])dop18.max[4]=val;
+
+		// Y + Z
+		val=this.vert[1]+this.vert[2];
+		if(val<dop18.min[5])dop18.min[5]=val;
+		if(val>dop18.max[5])dop18.max[5]=val;
+						
+		// X - Y
+		val=this.vert[0]-this.vert[1];
+		if(val<dop18.min[6])dop18.min[6]=val;
+		if(val>dop18.max[6])dop18.max[6]=val;
+		
+		// X - Z
+ 		val=this.vert[0]-this.vert[2];
+		if(val<dop18.min[7])dop18.min[7]=val;
+		if(val>dop18.max[7])dop18.max[7]=val;
+
+		// Y - Z
+		val=this.vert[1]-this.vert[2];
+		if(val<dop18.min[8])dop18.min[8]=val;
+		if(val>dop18.max[8])dop18.max[8]=val;
+	}
+	return dop18;
 };

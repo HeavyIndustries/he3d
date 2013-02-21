@@ -45,14 +45,14 @@ he3d.hud.resize=function(){
 he3d.hud.update=function(){
 	if(!he3d.hud.enabled)
 		return;
-	
+
 	this.now=he3d.timer.now();
 	if((this.now-he3d.hud.lastupd)<he3d.hud.updaterate&&!he3d.hud.dirty)
 		return;
 
 	he3d.hud.ctx.setTransform(1,0,0,1,0,0);
 	he3d.hud.ctx.clearRect(0,0,he3d.hud.size[0],he3d.hud.size[1]);
-	
+
 	he3d.hud.ctx.fillStyle='rgba(255,255,255,255)';
 	he3d.hud.ctx.font='bold 10pt Fixed';
 	he3d.hud.ctx.textAlign='left';
@@ -82,10 +82,10 @@ he3d.hud.update=function(){
 			he3d.t.textures[he3d.t.viewer.id].height+"]",0,0);
 		he3d.hud.ctx.textAlign='left';
 	}
-		
+
 	// External Hud Callback
 	if(he3d.hud.cb) he3d.hud.cb();
-	
+
 	// Set next update flags
 	he3d.hud.dirty=false;
 	he3d.hud.lastupd=this.now;
@@ -98,18 +98,18 @@ he3d.hud3d={};
 he3d.hud3d.init=function(){
 	// Shader
 	he3d.s.load({name:'hud',bind:he3d.hud.bind});
-	
+
 	// Quad
-	he3d.hud.vbo=he3d.primatives.quad();
+	he3d.hud.vbo=he3d.primatives.quad('vt');
 	he3d.hud.vbo.fillStyle=2;
 	he3d.hud.vbo.shader='hud';
 
 	// Canvas
 	he3d.hud.canvas=document.createElement('canvas');
-	he3d.hud.canvas.setAttribute('width',he3d.hud.size[0]);  
+	he3d.hud.canvas.setAttribute('width',he3d.hud.size[0]);
 	he3d.hud.canvas.setAttribute('height',he3d.hud.size[1]);
 	he3d.hud.canvas.setAttribute('id','hud');
-	
+
 	he3d.hud.canvas=document.getElementById('hud');
 	he3d.hud.canvas.setAttribute('width',he3d.hud.size[0]);
 	he3d.hud.canvas.setAttribute('height',he3d.hud.size[1]);
@@ -138,40 +138,39 @@ he3d.hud3d.draw=function(){
 	if(!he3d.hud.enabled)
 		return;
 
-	he3d.r.changeProgram(he3d.hud.vbo.shader);
+	var vbo=he3d.hud.vbo;
+
+	he3d.r.changeProgram(vbo.shader);
 
 	he3d.gl.enable(he3d.gl.BLEND);
 	he3d.gl.disable(he3d.gl.DEPTH_TEST);
 
 	// Object Data
-	he3d.gl.bindBuffer(he3d.gl.ARRAY_BUFFER,he3d.hud.vbo.buf_data);
+	he3d.gl.bindBuffer(he3d.gl.ARRAY_BUFFER,vbo.buf_data);
 
-	he3d.gl.enableVertexAttribArray(he3d.r.curProgram.attributes['aPosition']);
 	he3d.gl.vertexAttribPointer(he3d.r.curProgram.attributes['aPosition'],
-		3,he3d.gl.FLOAT,false,48,0);
-
-	he3d.gl.enableVertexAttribArray(he3d.r.curProgram.attributes['aTexCoord']);
+		vbo.buf_sizes['v'],he3d.gl.FLOAT,false,vbo.buf_size,vbo.buf_offsets['v']);
 	he3d.gl.vertexAttribPointer(he3d.r.curProgram.attributes['aTexCoord'],
-		2,he3d.gl.FLOAT,false,48,40);
+		vbo.buf_sizes['t'],he3d.gl.FLOAT,false,vbo.buf_size,vbo.buf_offsets['t']);
 
-	he3d.gl.bindBuffer(he3d.gl.ELEMENT_ARRAY_BUFFER,he3d.hud.vbo.buf_indices);
-	he3d.gl.drawElements(he3d.hud.vbo.rendertype,he3d.hud.vbo.indices,he3d.gl.UNSIGNED_SHORT,0);
+	he3d.gl.bindBuffer(he3d.gl.ELEMENT_ARRAY_BUFFER,vbo.buf_indices);
+	he3d.gl.drawElements(vbo.rendertype,vbo.indices,he3d.gl.UNSIGNED_SHORT,0);
 
 	he3d.gl.enable(he3d.gl.DEPTH_TEST);
-	he3d.gl.disable(he3d.gl.BLEND);	
+	he3d.gl.disable(he3d.gl.BLEND);
 };
 
 he3d.hud3d.update=function(){
 	if(!he3d.hud.enabled)
 		return;
-	
+
 	var now=he3d.timer.now();
 	if((now-he3d.hud.lastupd)<he3d.hud.updaterate&&!he3d.hud.dirty)
 		return;
 
 	he3d.hud.ctx.setTransform(1,0,0,1,0,0);
 	he3d.hud.ctx.clearRect(0,0,he3d.hud.size[0],he3d.hud.size[1]);
-	
+
 	he3d.hud.ctx.fillStyle='rgba(255,255,255,255)';
 	he3d.hud.ctx.font='bold 10pt Fixed';
 	he3d.hud.ctx.textAlign='left';
@@ -181,10 +180,10 @@ he3d.hud3d.update=function(){
 	he3d.hud.ctx.translate(10,15);
 	he3d.hud.ctx.fillText(he3d.r.fps.current+"fps ("+
 		he3d.timer.frameTime+"ms)",0,0);
-	
+
 	// External Hud Callback
 	if(he3d.hud.cb) he3d.hud.cb();
-	
+
 	// Update Texture
 	he3d.t.update(he3d.hud.texture);
 	he3d.hud.dirty=false;

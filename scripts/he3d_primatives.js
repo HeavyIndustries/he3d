@@ -15,7 +15,7 @@ he3d.primatives.bbox=function(s){
 	for(var a in s){opts[a]=s[a];}
 
 	var bbox={};
-	
+
 	var verts=new Float32Array([
 		// Front face
 		opts.x.min, opts.y.min, opts.z.max,
@@ -96,31 +96,31 @@ he3d.primatives.bbox=function(s){
 		1.0, 0.0,
 		1.0, 1.0,
 		0.0, 1.0,
-		
+
 		// Back face
 		1.0, 0.0,
 		1.0, 1.0,
 		0.0, 1.0,
 		0.0, 0.0,
-		
+
 		// Top face
 		0.0, 1.0,
 		0.0, 0.0,
 		1.0, 0.0,
 		1.0, 1.0,
-		
+
 		// Bottom face
 		1.0, 1.0,
 		0.0, 1.0,
 		0.0, 0.0,
 		1.0, 0.0,
-		
+
 		// Right face
 		1.0, 0.0,
 		1.0, 1.0,
 		0.0, 1.0,
 		0.0, 0.0,
-		
+
 		// Left face
 		0.0, 0.0,
 		1.0, 0.0,
@@ -135,31 +135,31 @@ he3d.primatives.bbox=function(s){
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
-		
+
 		// Back face
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
-		
+
 		// Top face
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
-		
+
 		// Bottom face
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
-		
+
 		// Right face
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
-		
+
 		// Left face
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
@@ -205,7 +205,7 @@ he3d.primatives.bbox=function(s){
 		he3d.log("DEBUG","bbox Triangles:",bbox.indices/3);
 		he3d.log("DEBUG","bbox Created",'');
 	}
-	
+
 	bbox.loaded=true;
 	bbox.rendertype=he3d.gl.TRIANGLES;
 	return bbox;
@@ -221,7 +221,7 @@ he3d.primatives.cube=function(s){
 	for(var a in s){opts[a]=s[a];}
 
 	var cube={};
-	
+
 	var verts=new Float32Array([
 		// Front face
 		-1.0*opts.scale, -1.0*opts.scale,  1.0*opts.scale,
@@ -302,31 +302,31 @@ he3d.primatives.cube=function(s){
 		1.0, 0.0,
 		1.0, 1.0,
 		0.0, 1.0,
-		
+
 		// Back face
 		1.0, 0.0,
 		1.0, 1.0,
 		0.0, 1.0,
 		0.0, 0.0,
-		
+
 		// Top face
 		0.0, 1.0,
 		0.0, 0.0,
 		1.0, 0.0,
 		1.0, 1.0,
-		
+
 		// Bottom face
 		1.0, 1.0,
 		0.0, 1.0,
 		0.0, 0.0,
 		1.0, 0.0,
-		
+
 		// Right face
 		1.0, 0.0,
 		1.0, 1.0,
 		0.0, 1.0,
 		0.0, 0.0,
-		
+
 		// Left face
 		0.0, 0.0,
 		1.0, 0.0,
@@ -341,31 +341,31 @@ he3d.primatives.cube=function(s){
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[2], opts.color[3],
-		
+
 		// Back face
 		opts.color[1], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[1], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[1], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[1], opts.color[1], opts.color[2], opts.color[3],
-		
+
 		// Top face
 		opts.color[2], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[2], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[2], opts.color[1], opts.color[2], opts.color[3],
 		opts.color[2], opts.color[1], opts.color[2], opts.color[3],
-		
+
 		// Bottom face
 		opts.color[1], opts.color[2], opts.color[2], opts.color[3],
 		opts.color[1], opts.color[2], opts.color[2], opts.color[3],
 		opts.color[1], opts.color[2], opts.color[2], opts.color[3],
 		opts.color[1], opts.color[2], opts.color[2], opts.color[3],
-		
+
 		// Right face
 		opts.color[0], opts.color[0], opts.color[1], opts.color[3],
 		opts.color[0], opts.color[0], opts.color[1], opts.color[3],
 		opts.color[0], opts.color[0], opts.color[1], opts.color[3],
 		opts.color[0], opts.color[0], opts.color[1], opts.color[3],
-		
+
 		// Left face
 		opts.color[0], opts.color[1], opts.color[0], opts.color[3],
 		opts.color[0], opts.color[1], opts.color[0], opts.color[3],
@@ -412,7 +412,7 @@ he3d.primatives.cube=function(s){
 		he3d.log("DEBUG","Cube Triangles:",cube.indices/3);
 		he3d.log("DEBUG","Cube Created",'');
 	}
-	
+
 	cube.loaded=true;
 	cube.rendertype=he3d.gl.TRIANGLES;
 	return cube;
@@ -432,7 +432,7 @@ he3d.primatives.cylinder=function(s){
 	for(var a in s){opts[a]=s[a];}
 
 	var cylinder={};
-	
+
 	var verts=new Array();
 	var normals=new Array();
 	var texcoords=new Array();
@@ -443,24 +443,24 @@ he3d.primatives.cylinder=function(s){
 	for(var l=0;l<opts.layers;l++){
 		var	currentRadius=(opts.radius.length!=null)?opts.radius[l]:opts.radius;
 		var	color=(opts.color.length!=null)?opts.color[l]:opts.color;
-		
+
 		for(var ring=0; ring<opts.numRings; ring++){
 			for(var segment=0; segment<opts.segments; segment++){
 				var radians=he3d.m.degtorad((360/opts.segments)*segment);
 				var x=Math.cos(radians)*currentRadius;
 				var y=Math.sin(radians)*currentRadius;
 				var z=ring*-opts.spacing;
-	
+
 				verts.push(x,y,z);
 				normals.push(x,y,z);
-	
+
 				if(segment<(opts.segments-1)/ 2)
 					texcoords.push((1.0/(opts.segments))*segment*2,(1.0/4)*ring);
 				else
 					texcoords.push(2.0-((1.0/(opts.segments))*segment*2),(1.0/4)*ring);
-				
+
 				colors.push(color[0],color[1],color[2],color[3]);
-	
+
 				if(ring<opts.numRings-1){
 					if(segment<opts.segments-1){
 						if(opts.insideout){
@@ -484,7 +484,7 @@ he3d.primatives.cylinder=function(s){
 			}
 		}
 	}
-	
+
 	var data=he3d.tools.interleaveFloat32Arrays([3,3,4,2],[verts,normals,colors,texcoords]);
 	cylinder.buf_data=he3d.gl.createBuffer();
 	he3d.gl.bindBuffer(he3d.gl.ARRAY_BUFFER,cylinder.buf_data);
@@ -509,12 +509,16 @@ he3d.primatives.cylinder=function(s){
 	return cylinder;
 };
 
-he3d.primatives.quad=function(scale,color){
+he3d.primatives.quad=function(diFormat,scale,color){
 	if(!scale)scale=1.0;
 	if(!color)color=[1.0,0.0,1.0,1.0];
-	
-	var quad={};
-		
+
+	var vbo={};
+	if(!diFormat)
+		diFormat='vnct';
+	vbo.diFormat=diFormat;
+	diFormat=diFormat.split('');
+
 	var verts=new Float32Array([
 		-1.0*scale, -1.0*scale, -2.4,
 		 1.0*scale, -1.0*scale, -2.4,
@@ -540,17 +544,33 @@ he3d.primatives.quad=function(scale,color){
 		0.0, 1.0
 	]);
 
-	var data=he3d.tools.interleaveFloat32Arrays([3,3,4,2],[verts,normals,colors,texcoords]);
-	quad.buf_data=he3d.gl.createBuffer();
-	he3d.gl.bindBuffer(he3d.gl.ARRAY_BUFFER,quad.buf_data);
+	var diTypes=[],diDSizes=[],diSizes=[],diOffsets=[],curOff=0;
+	for(var dit in diFormat){
+		switch(diFormat[dit]){
+			case 'v':diTypes.push(verts);diDSizes.push(3);diSizes[diFormat[dit]]=3;break;
+			case 'n':diTypes.push(normals);diDSizes.push(3);diSizes[diFormat[dit]]=3;break;
+			case 'c':diTypes.push(colors);diDSizes.push(4);diSizes[diFormat[dit]]=4;break;
+			case 't':diTypes.push(texcoords);diDSizes.push(2);diSizes[diFormat[dit]]=2;break;
+			case 'b':diTypes.push(barys);diDSizes.push(3);diSizes[diFormat[dit]]=3;break;
+			default:he3d.log("WARNING","Unknown DataInterleave Type",dit);continue;break;
+		};
+		diOffsets[diFormat[dit]]=curOff;
+		curOff+=(diDSizes[diDSizes.length-1]*Float32Array.BYTES_PER_ELEMENT);
+	}
+	var data=he3d.tools.interleaveFloat32Arrays(diDSizes,diTypes);
+	vbo.buf_offsets=diOffsets;
+	vbo.buf_sizes=diSizes;
+	vbo.buf_size=diDSizes.reduce(function(a,b){return a+b;})*Float32Array.BYTES_PER_ELEMENT;
+	vbo.buf_data=he3d.gl.createBuffer();
+	he3d.gl.bindBuffer(he3d.gl.ARRAY_BUFFER,vbo.buf_data);
 	he3d.gl.bufferData(he3d.gl.ARRAY_BUFFER,data,he3d.gl.STATIC_DRAW);
 
 	var indices=new Uint16Array([
 		0, 1, 2, 0, 2, 3
 	]);
-	quad.buf_indices=he3d.gl.createBuffer();
-	quad.indices=indices.length;
-	he3d.gl.bindBuffer(he3d.gl.ELEMENT_ARRAY_BUFFER,quad.buf_indices);
+	vbo.buf_indices=he3d.gl.createBuffer();
+	vbo.indices=indices.length;
+	he3d.gl.bindBuffer(he3d.gl.ELEMENT_ARRAY_BUFFER,vbo.buf_indices);
 	he3d.gl.bufferData(he3d.gl.ELEMENT_ARRAY_BUFFER,indices,he3d.gl.STATIC_DRAW);
 
 	if(he3d.primatives.debug){
@@ -559,17 +579,21 @@ he3d.primatives.quad=function(scale,color){
 		he3d.log("DEBUG","Quad Normals:",normals.length/3);
 		he3d.log("DEBUG","Quad Colors:",colors.length/4);
 		he3d.log("DEBUG","Quad TexCoords:",texcoords.length/2);
-		he3d.log("DEBUG","Quad Triangles:",quad.indices/3);
+		he3d.log("DEBUG","Quad Triangles:",vbo.indices/3);
 		he3d.log("DEBUG","Quad Created",'');
 	}
 
-	quad.loaded=true;
-	quad.rendertype=he3d.gl.TRIANGLES;
-	return quad;
+	vbo.loaded=true;
+	vbo.rendertype=he3d.gl.TRIANGLES;
+	return vbo;
 };
 
-he3d.primatives.plane=function(size,scale,pcolors){
-	var plane={};
+he3d.primatives.plane=function(diFormat,size,scale,pcolors){
+	var vbo={};
+	if(!diFormat)
+		diFormat='vnct';
+	vbo.diFormat=diFormat;
+	diFormat=diFormat.split('');
 
 	size++;
 	var totalverts=size*size;
@@ -580,6 +604,7 @@ he3d.primatives.plane=function(size,scale,pcolors){
 	var texcoords=new Array();
 	var colors=new Array();
 	var indices=new Array();
+	var barys=new Array();
 
 	// Verts
 	for(var i=0;i<tmpverts.length;i++)
@@ -596,9 +621,9 @@ he3d.primatives.plane=function(size,scale,pcolors){
 	}
 
 	var iteration=1;
-	count=0;	
-	while(count < (totalverts - size-1)){
-		while( count < ((size * iteration)-1)){
+	count=0;
+	while(count<(totalverts-size-1)){
+		while(count<((size*iteration)-1)){
 			verts.push(
 				tmpverts[count][0], tmpverts[count][1], tmpverts[count][2],
 				tmpverts[count+size][0],tmpverts[count+size][1],tmpverts[count+size][2],
@@ -607,6 +632,14 @@ he3d.primatives.plane=function(size,scale,pcolors){
 				tmpverts[count+size][0],tmpverts[count+size][1],tmpverts[count+size][2],
 				tmpverts[count+size+1][0],tmpverts[count+size+1][1],tmpverts[count+size+1][2]
 			);
+			barys.push(
+				1.0,0.0,0.0,
+				0.0,1.0,0.0,
+				0.0,0.0,1.0,
+				1.0,0.0,0.0,
+				0.0,1.0,0.0,
+				0.0,0.0,1.0
+			);
 			count++;
 		}
 		iteration++;
@@ -614,18 +647,18 @@ he3d.primatives.plane=function(size,scale,pcolors){
 	}
 
 	iteration=1;
-	count=0;	
+	count=0;
 	while(count<(totalverts-size-1)){
 		while(count<((size*iteration)-1)){
 
 			normals.push(0,1,0,0,1,0,0,1,0,0,1,0,0,1,0,0,1,0);
-				
+
 			texcoords.push(
 				0.0, 0.0,
 				1.0, 0.0,
 				0.0, 1.0,
 				0.0, 1.0,
-				1.0, 0.0, 
+				1.0, 0.0,
 				1.0, 1.0
 			);
 
@@ -639,7 +672,7 @@ he3d.primatives.plane=function(size,scale,pcolors){
 					0.0,1.0,1.0,1.0,
 					0.0,0.0,1.0,1.0
 				);
-			} else {				
+			} else {
 				colors.push(
 					pcolors[0],pcolors[1],pcolors[2],pcolors[3],
 					pcolors[0],pcolors[1],pcolors[2],pcolors[3],
@@ -656,19 +689,38 @@ he3d.primatives.plane=function(size,scale,pcolors){
 		count++;
 	}
 
-	var data=he3d.tools.interleaveFloat32Arrays([3,3,4,2],[verts,normals,colors,texcoords]);
-	plane.buf_data=he3d.gl.createBuffer();
-	he3d.gl.bindBuffer(he3d.gl.ARRAY_BUFFER,plane.buf_data);
+	vbo.verts=verts;
+
+	var diTypes=[],diDSizes=[],diSizes=[],diOffsets=[],curOff=0;
+	for(var dit in diFormat){
+		switch(diFormat[dit]){
+			case 'v':diTypes.push(verts);diDSizes.push(3);diSizes[diFormat[dit]]=3;break;
+			case 'n':diTypes.push(normals);diDSizes.push(3);diSizes[diFormat[dit]]=3;break;
+			case 'c':diTypes.push(colors);diDSizes.push(4);diSizes[diFormat[dit]]=4;break;
+			case 't':diTypes.push(texcoords);diDSizes.push(2);diSizes[diFormat[dit]]=2;break;
+			case 'b':diTypes.push(barys);diDSizes.push(3);diSizes[diFormat[dit]]=3;break;
+			default:he3d.log("WARNING","Unknown DataInterleave Type",dit);continue;break;
+		};
+		diOffsets[diFormat[dit]]=curOff;
+		curOff+=(diDSizes[diDSizes.length-1]*Float32Array.BYTES_PER_ELEMENT);
+	}
+	var data=he3d.tools.interleaveFloat32Arrays(diDSizes,diTypes);
+	vbo.buf_offsets=diOffsets;
+	vbo.buf_sizes=diSizes;
+	vbo.buf_size=diDSizes.reduce(function(a,b){return a+b;})*Float32Array.BYTES_PER_ELEMENT;
+
+	vbo.buf_data=he3d.gl.createBuffer();
+	he3d.gl.bindBuffer(he3d.gl.ARRAY_BUFFER,vbo.buf_data);
 	he3d.gl.bufferData(he3d.gl.ARRAY_BUFFER,data,he3d.gl.STATIC_DRAW);
 
-	count=0;	
+	count=0;
 	while(count<verts.length/3){
 		indices.push(count);
 		count++;
 	};
-	plane.buf_indices=he3d.gl.createBuffer();
-	plane.indices=indices.length;
-	he3d.gl.bindBuffer(he3d.gl.ELEMENT_ARRAY_BUFFER,plane.buf_indices);
+	vbo.buf_indices=he3d.gl.createBuffer();
+	vbo.indices=indices.length;
+	he3d.gl.bindBuffer(he3d.gl.ELEMENT_ARRAY_BUFFER,vbo.buf_indices);
 	he3d.gl.bufferData(he3d.gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(indices),he3d.gl.STATIC_DRAW);
 
 	if(he3d.primatives.debug){
@@ -678,13 +730,13 @@ he3d.primatives.plane=function(size,scale,pcolors){
 		he3d.log("DEBUG","Plane Normals:",normals.length/3);
 		he3d.log("DEBUG","Plane Colors:",colors.length/4);
 		he3d.log("DEBUG","Plane TexCoords:",texcoords.length/2);
-		he3d.log("DEBUG","Plane Triangles:",plane.indices/3);
+		he3d.log("DEBUG","Plane Triangles:",vbo.indices/3);
 		he3d.log("DEBUG","Plane Created",'');
 	}
 
-	plane.loaded=true;
-	plane.rendertype=he3d.gl.TRIANGLES;
-	return plane;
+	vbo.loaded=true;
+	vbo.rendertype=he3d.gl.TRIANGLES;
+	return vbo;
 };
 
 he3d.primatives.sphere=function(s){
@@ -698,7 +750,7 @@ he3d.primatives.sphere=function(s){
 	for(var a in s){opts[a]=s[a];}
 
 	var sphere={};
-	
+
 	var verts=new Array();
 	var normals=new Array();
 	var texcoords=new Array();
@@ -709,18 +761,18 @@ he3d.primatives.sphere=function(s){
 		var theta=latNumber*Math.PI/opts.latBands;
 		var sinTheta=Math.sin(theta);
 		var cosTheta=Math.cos(theta);
-		
+
 		for(var longNumber=0;longNumber<=opts.longBands;longNumber++){
 			var phi=longNumber*2*Math.PI/opts.longBands;
 			var sinPhi=Math.sin(phi);
 			var cosPhi=Math.cos(phi);
-			
+
 			var x=cosPhi*sinTheta;
 			var y=cosTheta;
 			var z=sinPhi*sinTheta;
 			var u=1-(longNumber/opts.longBands);
 			var v=latNumber/opts.latBands;
-			
+
 			verts.push(opts.radius*x);
 			verts.push(opts.radius*y);
 			verts.push(opts.radius*z);
@@ -735,7 +787,7 @@ he3d.primatives.sphere=function(s){
 			colors.push(opts.color[3]);
 		}
 	}
- 
+
 	for(var latNumber=0;latNumber<opts.latBands;latNumber++){
 		for(var longNumber=0;longNumber<opts.longBands;longNumber++){
 			var first=(latNumber*(opts.longBands+1))+longNumber;
@@ -743,7 +795,7 @@ he3d.primatives.sphere=function(s){
 			indices.push(first);
 			indices.push(second);
 			indices.push(first+1);
-			
+
 			indices.push(second);
 			indices.push(second+1);
 			indices.push(first+1);
@@ -751,7 +803,7 @@ he3d.primatives.sphere=function(s){
 	}
 
 	sphere.radius=opts.radius;
-	
+
 	var data=he3d.tools.interleaveFloat32Arrays([3,3,4,2],[verts,normals,colors,texcoords]);
 	sphere.buf_data=he3d.gl.createBuffer();
 	he3d.gl.bindBuffer(he3d.gl.ARRAY_BUFFER,sphere.buf_data);
