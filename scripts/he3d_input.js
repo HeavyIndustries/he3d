@@ -1,12 +1,12 @@
 //
 // Input Functions
 //
-he3d.log('notice','Include Loaded...','Input');
+he3d.log('notice',  'Include Loaded...',  'Input');
 
 //
 // Enums -------------------------------------------------------------------------------------------
 //
-he3d.e.keys={
+he3d.e.keys = {
 	BACKSPACE: 8,
 	TAB: 9,
 	ENTER: 13,
@@ -107,82 +107,82 @@ he3d.e.keys={
 	CLOSE_BRACKET: 221,
 	SINGLE_QUOTE: 222
 };
-he3d.e.mouse={
-	left:0,
-	middle:1,
-	right:2
+he3d.e.mouse = {
+	left:	0,
+	middle:	1,
+	right:	2
 };
-he3d.e.gamepad={};
+he3d.e.gamepad = {};
 
 //
 // Input Manager -----------------------------------------------------------------------------------
 //
-he3d.i={
-	gamepad:{
-		buttons:[false,false,false,false,false,false,false,false,false],
+he3d.i = {
+	gamepad: {
+		buttons:[false, false, false, false, false, false, false, false, false],
 		device:null
 	},
-	keys:[],
+	keys:	[],
 	mouse:{
 		buttons:[],
-		buf:[[0,0],[0,0]],
-		bufi:0,
-		delta:[0,0],
-		invert:false,
-		lpos:[0,0],
-		pos:[0,0],
-		wheel:0
+		buf:	[[0, 0], [0, 0]],
+		bufi:	0,
+		delta:	[0, 0],
+		invert:	false,
+		lpos:	[0, 0],
+		pos:	[0, 0],
+		wheel:	0
 	},
 	hasPointerlock:false,
 	pointerLocked:false
 };
 
-he3d.i.initBindings=function(){
+he3d.i.initBindings = function() {
 	// Pointer Lock API Support
-	if((he3d.i.hasPointerlock='pointerLockElement' in document
+	if ((he3d.i.hasPointerlock='pointerLockElement' in document
 		|| 'mozPointerLockElement' in document
-		|| 'webkitPointerLockElement' in document)){
-		document.addEventListener('pointerlockchange',he3d.i.pointerLock,false);
-		document.addEventListener('mozpointerlockchange',he3d.i.pointerLock,false);
-		document.addEventListener('webkitpointerlockchange',he3d.i.pointerLock,false);
-		document.addEventListener('pointerlockerror',he3d.i.pointerLockError,false);
-		document.addEventListener('mozpointerlockerror',he3d.i.pointerLockError,false);
-		document.addEventListener('webkitpointerlockerror',he3d.i.pointerLockError,false);
+		|| 'webkitPointerLockElement' in document)) {
+		document.addEventListener('pointerlockchange', he3d.i.pointerLock, false);
+		document.addEventListener('mozpointerlockchange', he3d.i.pointerLock, false);
+		document.addEventListener('webkitpointerlockchange', he3d.i.pointerLock, false);
+		document.addEventListener('pointerlockerror', he3d.i.pointerLockError, false);
+		document.addEventListener('mozpointerlockerror', he3d.i.pointerLockError, false);
+		document.addEventListener('webkitpointerlockerror', he3d.i.pointerLockError, false);
 	}
 
 	//
 	// Keyboard
 	//
-	document.onkeydown=function(e){
-		if(!he3d.console.open&&e.keyCode!=he3d.e.keys.GRAVE_ACCENT&&!he3d.t.viewer.enabled){
-			he3d.i.keys[e.keyCode]=true;
+	document.onkeydown = function(e) {
+		if (!he3d.console.open && e.keyCode != he3d.e.keys.GRAVE_ACCENT && !he3d.t.viewer.enabled) {
+			he3d.i.keys[e.keyCode] = true;
 		}
 
 		// Full Screen
-		if(he3d.i.keys[he3d.e.keys.ALT]&&he3d.i.keys[he3d.e.keys.ENTER]){
+		if (he3d.i.keys[he3d.e.keys.ALT] && he3d.i.keys[he3d.e.keys.ENTER]) {
 			he3d.r.setFullScreen();
-			he3d.i.keys[he3d.e.keys.ENTER]=false;
+			he3d.i.keys[he3d.e.keys.ENTER] = false;
 		}
 	};
-	document.onkeyup=function(e){
-		var triggered=false;
+	document.onkeyup = function(e) {
+		var triggered = false;
 		// Console Binds
-		if(he3d.console.open){
-			switch(e.keyCode){
+		if (he3d.console.open) {
+			switch (e.keyCode) {
 				case he3d.e.keys.ESCAPE:
 					he3d.console.toggle();
-					triggered=true;
+					triggered = true;
 					break;
 				case he3d.e.keys.PAGE_UP:
 					he3d.console.scroll('up');
-					triggered=true;
+					triggered = true;
 					break;
 				case he3d.e.keys.PAGE_DOWN:
 					he3d.console.scroll('down');
-					triggered=true;
+					triggered = true;
 					break;
 			}
-			if(triggered){
+			if (triggered) {
 				e.stopPropagation();
 				e.preventDefault();
 				return false;
@@ -190,193 +190,197 @@ he3d.i.initBindings=function(){
 		}
 
 		// Texture Viewer Super Binds
-		if(he3d.t&&he3d.t.viewer.enabled){
-			switch(e.keyCode){
+		if (he3d.t && he3d.t.viewer.enabled) {
+			switch (e.keyCode) {
 				case he3d.e.keys.ESCAPE:
 					he3d.t.viewer.toggle(false);
-					triggered=true;
-					he3d.hud.dirty=true;
+					triggered = true;
+					he3d.hud.dirty = true;
 					break;
 				case he3d.e.keys.LEFT_ARROW:
-					var t=he3d.t.viewer.id-1;
-					if(t<0)
+					var t = he3d.t.viewer.id - 1;
+					if (t < 0)
 						break;
-					he3d.log('NOTICE','Viewing Texture:',t+": "+
-						he3d.t.textures[t].name+' ['+he3d.t.textures[t].type+']'+
-						(he3d.t.textures[t].width?' ['+he3d.t.textures[t].width+','+
-						he3d.t.textures[t].height+']':''));
-					he3d.t.viewer.id=t;
-					he3d.s.shaders[he3d.fx.postProcessing.shader].bound=false;
-					triggered=true;
-					he3d.hud.dirty=true;
+					he3d.log('NOTICE', 'Viewing Texture:', t + ": " +
+						he3d.t.textures[t].name + ' [' + he3d.t.textures[t].type+']' +
+						(he3d.t.textures[t].width ? ' [' + he3d.t.textures[t].width + ', ' +
+						he3d.t.textures[t].height + ']' : ''));
+					he3d.t.viewer.id = t;
+					he3d.s.shaders[he3d.fx.postProcessing.shader].bound = false;
+					triggered = true;
+					he3d.hud.dirty = true;
 					break;
 				case he3d.e.keys.RIGHT_ARROW:
-					var t=he3d.t.viewer.id+1;
-					if(t>he3d.t.textures.length-1)
+					var t = he3d.t.viewer.id + 1;
+					if (t > he3d.t.textures.length - 1)
 						break;
-					he3d.log('NOTICE','Viewing Texture:',t+": "+
-						he3d.t.textures[t].name+' ['+he3d.t.textures[t].type+']'+
-						(he3d.t.textures[t].width?' ['+he3d.t.textures[t].width+','+
-						he3d.t.textures[t].height+']':''));
-					he3d.t.viewer.id=t;
-					he3d.s.shaders[he3d.fx.postProcessing.shader].bound=false;
-					triggered=true;
-					he3d.hud.dirty=true;
+					he3d.log('NOTICE', 'Viewing Texture:', t + ": " +
+						he3d.t.textures[t].name + ' ['+he3d.t.textures[t].type + ']' +
+						(he3d.t.textures[t].width ? ' [' + he3d.t.textures[t].width + ', ' +
+						he3d.t.textures[t].height + ']':''));
+					he3d.t.viewer.id = t;
+					he3d.s.shaders[he3d.fx.postProcessing.shader].bound = false;
+					triggered = true;
+					he3d.hud.dirty = true;
 					break;
 			}
 		}
 
 		// Super Key Binds
-		switch(e.keyCode){
+		switch (e.keyCode) {
 			case he3d.e.keys.F1:
 				he3d.t.viewer.toggle();
-				triggered=true;
+				triggered = true;
 				break;
 			case he3d.e.keys.GRAVE_ACCENT:
 				he3d.console.toggle();
-				triggered=true;
+				triggered = true;
 				break;
 			case he3d.e.keys.PAUSE:
 				he3d.pause();
-				triggered=true;
+				triggered = true;
 				break;
 		}
-		if(triggered){
+		if (triggered) {
 			e.stopPropagation();
 			e.preventDefault();
 			return false;
 		}
 
 		// Everything Else
-		he3d.i.keys[e.keyCode]=false;
+		he3d.i.keys[e.keyCode] = false;
 	};
 
 	//
 	// Mouse
 	//
-	he3d.canvas.onmousedown=function(e){
-		he3d.i.mouse.buttons[e.button]=true;
+	he3d.canvas.onmousedown = function(e) {
+		he3d.i.mouse.buttons[e.button] = true;
 		e.stopPropagation();
 		e.preventDefault();
 	};
-	he3d.canvas.onmouseup=function(e){
-		he3d.i.mouse.buttons[e.button]=false;
+	he3d.canvas.onmouseup = function(e) {
+		he3d.i.mouse.buttons[e.button] = false;
 		e.stopPropagation();
 		e.preventDefault();
 	};
-	he3d.canvas.onmousemove=he3d.i.mouseMove;
-	he3d.canvas.onmousewheel=function(e){
-		if(e.wheelDelta)he3d.i.mouse.wheel=e.wheelDelta/120;
-		if(e.detail)he3d.i.mouse.wheel=-e.detail/3;
+	he3d.canvas.onmousemove = he3d.i.mouseMove;
+	he3d.canvas.onmousewheel = function(e) {
+		if (e.wheelDelta)
+			he3d.i.mouse.wheel = e.wheelDelta / 120;
+		if (e.detail)
+			he3d.i.mouse.wheel = -e.detail / 3;
 	};
-	he3d.canvas.addEventListener('DOMMouseScroll',he3d.canvas.onmousewheel,false);
+	he3d.canvas.addEventListener('DOMMouseScroll', he3d.canvas.onmousewheel, false);
 
 	//
 	// Gamepad
 	//
-	window.addEventListener('MozGamepadConnected',he3d.i.gamepad_connect,false);
-	window.addEventListener('MozGamepadDiconnected',he3d.i.gamepad_disconnect,false);
-	window.addEventListener('MozGamepadButtonDown',he3d.i.gamepad_buttonDown,false);
-	window.addEventListener('MozGamepadButtonUp',he3d.i.gamepad_buttonUp,false);
-//	window.addEventListener('MozGamepadAxisMove',he3d.i.gamepad_axisMove,false);
+	window.addEventListener('MozGamepadConnected', he3d.i.gamepad_connect, false);
+	window.addEventListener('MozGamepadDiconnected', he3d.i.gamepad_disconnect, false);
+	window.addEventListener('MozGamepadButtonDown', he3d.i.gamepad_buttonDown, false);
+	window.addEventListener('MozGamepadButtonUp', he3d.i.gamepad_buttonUp, false);
+//	window.addEventListener('MozGamepadAxisMove', he3d.i.gamepad_axisMove, false);
 };
 
-he3d.i.mouseMove=function(e){
-	if(he3d.i.pointerLocked){
-		he3d.i.mouse.buf[he3d.i.mouse.bufi][0]+=e.movementX||e.mozMovementX||e.webkitMovementX||0;
-		he3d.i.mouse.buf[he3d.i.mouse.bufi][1]+=e.movementY||e.mozMovementY||e.webkitMovementY||0;
+he3d.i.mouseMove = function(e) {
+	if (he3d.i.pointerLocked) {
+		he3d.i.mouse.buf[he3d.i.mouse.bufi][0] += e.movementX ||
+			e.mozMovementX || e.webkitMovementX || 0;
+		he3d.i.mouse.buf[he3d.i.mouse.bufi][1] += e.movementY ||
+			e.mozMovementY || e.webkitMovementY || 0;
 
-		he3d.i.mouse.delta[0]=(he3d.i.mouse.buf[0][0]+he3d.i.mouse.buf[1][0])*0.5;
-		he3d.i.mouse.delta[1]=(he3d.i.mouse.buf[0][1]+he3d.i.mouse.buf[1][1])*0.5;
+		he3d.i.mouse.delta[0] = (he3d.i.mouse.buf[0][0] + he3d.i.mouse.buf[1][0]) * 0.5;
+		he3d.i.mouse.delta[1] = (he3d.i.mouse.buf[0][1] + he3d.i.mouse.buf[1][1]) * 0.5;
 
-		he3d.i.mouse.bufi^=1;
-		he3d.i.mouse.buf[he3d.i.mouse.bufi][0]=0;
-		he3d.i.mouse.buf[he3d.i.mouse.bufi][1]=0;
+		he3d.i.mouse.bufi ^= 1;
+		he3d.i.mouse.buf[he3d.i.mouse.bufi][0] = 0;
+		he3d.i.mouse.buf[he3d.i.mouse.bufi][1] = 0;
 	} else {
 		he3d.i.mouse.lpos.set(he3d.i.mouse.pos);
-		he3d.i.mouse.pos[0]=e.pageX-this.offsetLeft;
-		he3d.i.mouse.pos[1]=e.pageY-this.offsetTop;
-		he3d.m.vec2.subtract(he3d.i.mouse.pos,he3d.i.mouse.lpos,he3d.i.mouse.delta);
+		he3d.i.mouse.pos[0] = e.pageX - he3d.canvas.offsetParent.offsetLeft;
+		he3d.i.mouse.pos[1] = e.pageY - he3d.canvas.offsetParent.offsetTop;
+		he3d.m.vec2.subtract(he3d.i.mouse.pos, he3d.i.mouse.lpos, he3d.i.mouse.delta);
 	}
 };
-he3d.i.initInputManager=function(){
-	for(var i in he3d.e.keys)
-		he3d.i.keys[he3d.e.keys[i]]=false;
-	he3d.log('NOTICE','Input Manager',he3d.i.keys.length+" keys initialised");
-	for(var i in he3d.e.mouse)
-		he3d.i.mouse.buttons[he3d.e.mouse[i]]=false;
-	he3d.log('NOTICE','Input Manager',he3d.i.mouse.buttons.length+" mouse buttons initialised");
+he3d.i.initInputManager = function() {
+	for (var i in he3d.e.keys)
+		he3d.i.keys[he3d.e.keys[i]] = false;
+	he3d.log('NOTICE', 'Input Manager', he3d.i.keys.length + " keys initialised");
+	for (var i in he3d.e.mouse)
+		he3d.i.mouse.buttons[he3d.e.mouse[i]] = false;
+	he3d.log('NOTICE', 'Input Manager', he3d.i.mouse.buttons.length + " mouse buttons initialised");
 
-	he3d.i.mouse.delta=he3d.m.vec2.create([0,0]);
-	he3d.i.mouse.lpos=he3d.m.vec2.create([0,0]);
-	he3d.i.mouse.pos=he3d.m.vec2.create([0,0]);
+	he3d.i.mouse.delta = he3d.m.vec2.create([0, 0]);
+	he3d.i.mouse.lpos = he3d.m.vec2.create([0, 0]);
+	he3d.i.mouse.pos = he3d.m.vec2.create([0, 0]);
 };
 
-he3d.i.reset=function(){
-	he3d.i.mouse.delta[0]=0;
-	he3d.i.mouse.delta[1]=0;
-	he3d.i.mouse.wheel=0;
+he3d.i.reset = function() {
+	he3d.i.mouse.delta[0] = 0;
+	he3d.i.mouse.delta[1] = 0;
+	he3d.i.mouse.wheel = 0;
 };
 
 //
 // Pointer Lock API --------------------------------------------------------------------------------
 //
-he3d.i.pointerLock=function(e){
-	if (document.pointerLockElement===he3d.canvas||
-		document.mozPointerLockElement===he3d.canvas||
-		document.webkitPointerLockElement===he3d.canvas){
-		if(he3d.i.pointerLocked)
+he3d.i.pointerLock = function(e) {
+	if (document.pointerLockElement === he3d.canvas ||
+		document.mozPointerLockElement === he3d.canvas ||
+		document.webkitPointerLockElement === he3d.canvas) {
+		if (he3d.i.pointerLocked)
 			return;
-		document.addEventListener("mousemove", he3d.i.mouseMove,false);
+		document.addEventListener("mousemove", he3d.i.mouseMove, false);
 		he3d.i.pointerLocked=true;
-		he3d.log("NOTICE","Pointer Lock","Enabled");
+		he3d.log("NOTICE", "Pointer Lock", "Enabled");
 	} else {
-		document.removeEventListener("mousemove",he3d.i.mouseMove,false);
-		he3d.i.pointerLocked=false;
-		he3d.log("NOTICE","Pointer Lock","Disabled");
+		document.removeEventListener("mousemove", he3d.i.mouseMove, false);
+		he3d.i.pointerLocked = false;
+		he3d.log("NOTICE", "Pointer Lock", "Disabled");
 	}
 };
-he3d.i.pointerLockError=function(e){
-	he3d.log("WARNING","Pointer Lock Request Failed");
+he3d.i.pointerLockError = function(e) {
+	he3d.log("WARNING", "Pointer Lock Request Failed");
 };
-he3d.i.requestPointerLock=function(){
-	if(he3d.canvas.requestPointerLock)
+he3d.i.requestPointerLock = function() {
+	if (he3d.canvas.requestPointerLock)
 		he3d.canvas.requestPointerLock();
-	if(he3d.canvas.webkitRequestPointerLock)
+	if (he3d.canvas.webkitRequestPointerLock)
 		he3d.canvas.webkitRequestPointerLock();
-	if(he3d.canvas.mozRequestPointerLock)
+	if (he3d.canvas.mozRequestPointerLock)
 		he3d.canvas.mozRequestPointerLock();
 };
-he3d.i.exitPointerLock=function(){
-	if(he3d.canvas.exitPointerLock)
+he3d.i.exitPointerLock = function() {
+	if (he3d.canvas.exitPointerLock)
 		he3d.canvas.exitPointerLock();
-	if(he3d.canvas.webkitExitPointerLock)
+	if (he3d.canvas.webkitExitPointerLock)
 		he3d.canvas.webkitExitPointerLock();
-	if(he3d.canvas.mozExitPointerLock)
+	if (he3d.canvas.mozExitPointerLock)
 		he3d.canvas.mozExitPointerLock();
 };
 
 //
 // Gamepad Handlers --------------------------------------------------------------------------------
 //
-he3d.i.gamepad_connect=function(e){
+he3d.i.gamepad_connect = function(e) {
 	try {
-    he3d.i.gamepad.device=new Input.Device(e.gamepad);
-    he3d.log('NOTICE',"Gamepad Connected",e.gamepad.id);
-  } catch (ex) {
-		he3d.log('NOTICE',"Gamepad Connect Failed",ex);
-  }
+		he3d.i.gamepad.device = new Input.Device(e.gamepad);
+		he3d.log('NOTICE', "Gamepad Connected", e.gamepad.id);
+	} catch (ex) {
+		he3d.log('NOTICE', "Gamepad Connect Failed", ex);
+	}
 };
-he3d.i.gamepad_disconnect=function(e){
-	he3d.log('NOTICE',"Gamepad Disconnected",e.gamepad.id);
-	he3d.i.gamepad.device=null;
+he3d.i.gamepad_disconnect = function(e) {
+	he3d.log('NOTICE', "Gamepad Disconnected", e.gamepad.id);
+	he3d.i.gamepad.device = null;
 };
 
-he3d.i.gamepad_buttonDown=function(e){
-	he3d.i.gamepad.buttons[e.gamepad.buttons[e.button]]=true;
+he3d.i.gamepad_buttonDown = function(e) {
+	he3d.i.gamepad.buttons[e.gamepad.buttons[e.button]] = true;
 };
-he3d.i.gamepad_buttonUp=function(e){
-	he3d.i.gamepad.buttons[e.gamepad.buttons[e.button]]=false;
+he3d.i.gamepad_buttonUp = function(e) {
+	he3d.i.gamepad.buttons[e.gamepad.buttons[e.button]] = false;
 };
-he3d.i.gamepad_axisMove=function(e){
+he3d.i.gamepad_axisMove = function(e) {
 };
